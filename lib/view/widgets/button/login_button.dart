@@ -8,7 +8,7 @@ class LoginButton extends StatelessWidget {
     required this.buttonColor,
     this.buttonRadius = 15,
     this.buttonHeight = 65,
-    this.buttonIcon = const Icon(Icons.add),
+    this.buttonIcon,
     required this.onPressed,
     this.textColor = Colors.white,
   }) : super(key: key);
@@ -17,7 +17,7 @@ class LoginButton extends StatelessWidget {
   final Color textColor;
   final double buttonRadius;
   final double buttonHeight;
-  final Widget buttonIcon;
+  final Widget? buttonIcon;
   final VoidCallback onPressed;
 
   @override
@@ -40,12 +40,23 @@ class LoginButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              buttonIcon,
-              Text(
-                buttonText,
-                style: TextStyle(color: textColor),
-              ),
-              const SizedBox(),
+              // Spreads yapısı ile
+              if (buttonIcon != null) ...[
+                buttonIcon!,
+                Text(
+                  buttonText,
+                  style: TextStyle(color: textColor),
+                ),
+                const SizedBox()
+              ],
+              if (buttonIcon == null) ...[
+                const SizedBox(),
+                Text(
+                  buttonText,
+                  style: TextStyle(color: textColor),
+                ),
+                const SizedBox(),
+              ]
             ],
           ),
         ),
@@ -53,3 +64,12 @@ class LoginButton extends StatelessWidget {
     );
   }
 }
+
+/* 
+buttonIcon!,
+              Text(
+                buttonText,
+                style: TextStyle(color: textColor),
+              ),
+              const SizedBox(),
+               */

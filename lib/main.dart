@@ -1,7 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:live_chat_app/screens/sign_in_page.dart';
+import 'package:live_chat_app/core/init/locator/global_locator.dart';
+import 'package:live_chat_app/view/screens/splash_screen.dart';
+import 'package:live_chat_app/provider/viewModel/user_view_model.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  setupLocator();
   runApp(const MyApp());
 }
 
@@ -16,7 +23,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: SignInPage(),
+      home: ChangeNotifierProvider(
+        create: (context) => UserViewModel(),
+        child: const SplashScreen(),
+      ),
     );
   }
 }
