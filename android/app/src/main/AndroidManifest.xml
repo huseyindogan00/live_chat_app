@@ -2,7 +2,8 @@
     package="com.example.live_chat_app">
     
    <uses-permission android:name="android.permission.INTERNET"/>
-   <application
+   <application> 
+        android:label="@string/app_name" 
         android:label="live_chat_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

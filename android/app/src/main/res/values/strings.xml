@@ -2,7 +2,7 @@
 <resources> 
     <string name="app_name">live_chat_app</string>
     <string name="facebook_app_id">1356859468383992</string>
-    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="fb_login_protocol_scheme">fb1356859468383992</string>
     <string name="facebook_client_token">ab20611f412911f5b4f2020f83f2e5c0</string>
 
 

@@ -1,9 +1,12 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:live_chat_app/models/user_model.dart';
-import 'package:live_chat_app/data/interface/auth_base.dart';
+import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/data/services/interface/auth_base.dart';
 
 class FirebaseAuthService implements AuthBase {
   final FirebaseAuth _firebaseAuthService = FirebaseAuth.instance;
@@ -67,12 +70,77 @@ class FirebaseAuthService implements AuthBase {
 
         return UserModel(
           userID: userCredential.user?.uid,
-          gmail: userCredential.user?.email,
+          email: userCredential.user?.email,
           name: userCredential.user?.displayName,
           phoneNumber: userCredential.user?.phoneNumber,
           photoUrl: userCredential.user?.photoURL,
         );
       }
+    }
+    return null;
+  }
+
+  @override
+  Future<UserModel?> signInWithFacebook() async {
+    final _facebookLogin = await FacebookLogin().logIn();
+
+    //final result = await _facebookLogin.logIn();
+    switch (_facebookLogin.status) {
+      case FacebookLoginStatus.success:
+        final FacebookAccessToken? accessToken = await _facebookLogin.accessToken;
+        if (accessToken != null) {
+          UserCredential firebaseResult =
+              await _firebaseAuthService.signInWithCredential(FacebookAuthProvider.credential(accessToken.token));
+          return UserModel(
+            email: firebaseResult.user!.email,
+            photoUrl: firebaseResult.user!.photoURL,
+            name: firebaseResult.user!.displayName,
+          );
+        }
+        //final profile = await _fb.getUserProfile();
+
+        break;
+      case FacebookLoginStatus.error:
+        print(_facebookLogin.error!.developerMessage.toString());
+        break;
+      case FacebookLoginStatus.cancel:
+        break;
+      default:
+        print(_facebookLogin.status);
+    }
+    return null;
+  }
+
+  @override
+  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) async {
+    UserCredential _userCredential =
+        await _firebaseAuthService.createUserWithEmailAndPassword(email: email, password: password);
+
+    if (_userCredential.user != null) {
+      return UserModel(
+        email: _userCredential.user!.email,
+        name: _userCredential.user!.displayName,
+        phoneNumber: _userCredential.user!.phoneNumber,
+        photoUrl: _userCredential.user!.photoURL,
+        userID: _userCredential.user!.uid,
+      );
+    }
+    return null;
+  }
+
+  @override
+  Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
+    UserCredential _userCredential =
+        await _firebaseAuthService.signInWithEmailAndPassword(email: email, password: password);
+
+    if (_userCredential.user != null) {
+      return UserModel(
+        email: _userCredential.user!.email,
+        name: _userCredential.user!.displayName,
+        phoneNumber: _userCredential.user!.phoneNumber,
+        photoUrl: _userCredential.user!.photoURL,
+        userID: _userCredential.user!.uid,
+      );
     }
     return null;
   }

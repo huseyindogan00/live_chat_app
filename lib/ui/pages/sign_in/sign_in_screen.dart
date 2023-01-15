@@ -1,10 +1,12 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:live_chat_app/ui/pages/sign_in/email_login_and_register.dart';
 import 'package:live_chat_app/core/product/constant/app_icons.dart';
 import 'package:live_chat_app/data/user_repository.dart';
-import 'package:live_chat_app/provider/viewModel/user_view_model.dart';
-import 'package:live_chat_app/view/widgets/button/login_button.dart';
+import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
+import 'package:live_chat_app/ui/widgets/button/login_button.dart';
 import 'package:provider/provider.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -46,7 +48,10 @@ class SignInScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             LoginButton(
-              buttonText: 'Gmail ile Giriş Yap',
+              buttonTextWidget: const Text(
+                'Gmail ile Giriş Yap',
+                style: TextStyle(color: Colors.black),
+              ),
               buttonColor: Colors.white,
               onPressed: () async {
                 await _userViewModel.signInWithGmail();
@@ -55,20 +60,28 @@ class SignInScreen extends StatelessWidget {
               textColor: Colors.black87,
             ),
             LoginButton(
-              buttonText: 'Facebook ile Oturum Aç',
+              buttonTextWidget: const Text('Facebook ile Oturum Aç'),
               buttonColor: const Color(0xFF334D92),
-              onPressed: () {},
+              onPressed: () async {
+                //await _userViewModel.signInWithFacebook();
+              },
               buttonIcon: Image.asset(AppIcons.facebook),
             ),
             LoginButton(
-              buttonText: 'Email ve Şifre ile Giriş Yap',
+              buttonTextWidget: const Text('Email ve Şifre ile Giriş Yap'),
               buttonColor: Colors.purple,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const EmailLoginAndRegister(),
+                  ),
+                );
+              },
               buttonIcon: Image.asset(AppIcons.mail),
               textColor: Colors.white,
             ),
             LoginButton(
-              buttonText: 'Misafir Girişi',
+              buttonTextWidget: const Text('Misafir Girişi'),
               buttonColor: Colors.teal,
               buttonIcon: const Icon(Icons.supervised_user_circle_rounded),
               onPressed: () async {

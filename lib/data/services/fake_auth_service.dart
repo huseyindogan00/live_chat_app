@@ -1,5 +1,5 @@
-import 'package:live_chat_app/models/user_model.dart';
-import 'package:live_chat_app/data/interface/auth_base.dart';
+import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/data/services/interface/auth_base.dart';
 
 class FakeAuthService implements AuthBase {
   String userID = '121121212321321321321312323';
@@ -24,6 +24,24 @@ class FakeAuthService implements AuthBase {
   @override
   Future<UserModel> signInWithGmail() {
     // TODO: implement signInWithGmail
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserModel?> signInWithFacebook() {
+    // TODO: implement signInWithFacebook
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) {
+    // TODO: implement crateUserWithEmailAndPassword
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UserModel?> signInWithEmailAndPassword(String email, String password) {
+    // TODO: implement signInWithEmailAndPassword
     throw UnimplementedError();
   }
 }

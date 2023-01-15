@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class LoginButton extends StatelessWidget {
   const LoginButton({
     Key? key,
-    required this.buttonText,
+    required this.buttonTextWidget,
     required this.buttonColor,
     this.buttonRadius = 15,
     this.buttonHeight = 65,
@@ -12,7 +12,7 @@ class LoginButton extends StatelessWidget {
     required this.onPressed,
     this.textColor = Colors.white,
   }) : super(key: key);
-  final String buttonText;
+  final Widget buttonTextWidget;
   final Color buttonColor;
   final Color textColor;
   final double buttonRadius;
@@ -43,18 +43,12 @@ class LoginButton extends StatelessWidget {
               // Spreads yapısı ile
               if (buttonIcon != null) ...[
                 buttonIcon!,
-                Text(
-                  buttonText,
-                  style: TextStyle(color: textColor),
-                ),
-                const SizedBox()
+                buttonTextWidget,
+                const SizedBox(),
               ],
               if (buttonIcon == null) ...[
                 const SizedBox(),
-                Text(
-                  buttonText,
-                  style: TextStyle(color: textColor),
-                ),
+                buttonTextWidget,
                 const SizedBox(),
               ]
             ],

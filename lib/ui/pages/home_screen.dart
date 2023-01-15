@@ -1,8 +1,8 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
-import 'package:live_chat_app/models/user_model.dart';
-import 'package:live_chat_app/provider/viewModel/user_view_model.dart';
+import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
               CircleAvatar(foregroundImage: userModel!.photoUrl != null ? NetworkImage(userModel!.photoUrl!) : null),
               const Spacer(flex: 1),
               Text(
-                'Mail : ${userModel!.gmail ?? ''}',
+                'Mail : ${userModel!.email ?? ''}',
                 style: Theme.of(context).textTheme.headline5,
               ),
               const Spacer(flex: 1),
