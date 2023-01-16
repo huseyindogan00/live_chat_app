@@ -107,18 +107,13 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<UserModel?> crateUserWithEmailAndPassword(
-      String email, String password) async {
+  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) async {
     try {
       state = ViewState.Busy;
-      if (emailPasswordControl(email, password)) {
-        _userModel = await _userRepository.crateUserWithEmailAndPassword(
-            email, password);
-      }
 
-      print(_userModel);
-    } catch (e) {
-      debugPrint('ViewModeldeki create user hatası $e');
+      _userModel = await _userRepository.crateUserWithEmailAndPassword(email, password);
+    } on FirebaseAuthException catch (e) {
+      debugPrint('ViewModeldeki create user hatası ${e.message}');
     } finally {
       state = ViewState.Idle;
     }
@@ -126,41 +121,43 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<UserModel?> signInWithEmailAndPassword(
-      String email, String password) async {
+  Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
     try {
       state = ViewState.Busy;
-      if (emailPasswordControl(email, password)) {
-        _userModel =
-            await _userRepository.signInWithEmailAndPassword(email, password);
-      }
+      _userModel = await _userRepository.signInWithEmailAndPassword(email, password);
     } on FirebaseAuthException catch (e) {
-      debugPrint(
-          'ViewModeldeki sign in with email password hatası -> ${e.message}');
+      debugPrint('ViewModeldeki sign in with email password hatası -> ${e.message}');
     } finally {
       state = ViewState.Idle;
     }
     return _userModel;
   }
 
-  bool emailPasswordControl(String email, String password) {
-    var result = true;
-    if (!email.contains('@')) {
-      emailErrorMessage = 'Geçersiz email adresi';
-      result = false;
+  // password validation yapar
+  String? passwordControl(String? value) {
+    if (value != null && value.isNotEmpty) {
+      if (value.length < 6) {
+        return 'En az altı karakter olmalı';
+      }
+      return null;
     } else {
-      emailErrorMessage = '';
+      return 'Şifre giriniz';
     }
-    if (password.length < 6) {
-      passwordErrorMessage = 'En az altı karakter olmalı';
-      result = false;
-    } else {
-      passwordErrorMessage = '';
-    }
-
-    return result;
   }
 
+  // email validation yapar
+  String? emailControl(String? value) {
+    if (value != null && value.isNotEmpty) {
+      if (!value.contains('@')) {
+        return 'Geçersiz email adresi';
+      }
+      return null;
+    } else {
+      return 'Email adresi giriniz!';
+    }
+  }
+
+  // DEBUG(hata ayıklama)  ve RELEASE(yayınlama) modları arasında geçişi kontrol eder
   void changeAppMode(bool value) {
     _appModeState = value;
     _userRepository.appMode = _appModeState ? AppMode.RELEASE : AppMode.DEBUG;
