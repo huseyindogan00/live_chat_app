@@ -27,10 +27,13 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
   Widget build(BuildContext context) {
     _userViewModel = Provider.of<UserViewModel>(context);
     _buttonText = _formType == FormType.LOGIN ? 'Giriş Yap' : 'Kayıt Ol';
-    _linkText = _formType == FormType.LOGIN ? 'Hesabınız yok mu? Kayıt olun.' : 'Hesabınız var mı? Giriş Yapın.';
+    _linkText = _formType == FormType.LOGIN
+        ? 'Hesabınız yok mu? Kayıt olun.'
+        : 'Hesabınız var mı? Giriş Yapın.';
 
     if (_userViewModel.userModel != null) {
-      Future.delayed(const Duration(milliseconds: 100), () => Navigator.pop(context));
+      Future.delayed(
+          const Duration(milliseconds: 100), () => Navigator.pop(context));
     }
 
     return Scaffold(
@@ -71,7 +74,9 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
           TextFormField(
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              errorText: _userViewModel.emailErrorMessage.isNotEmpty ? _userViewModel.emailErrorMessage : null,
+              errorText: _userViewModel.emailErrorMessage.isNotEmpty
+                  ? _userViewModel.emailErrorMessage
+                  : null,
               prefixIcon: const Icon(Icons.email),
               hintText: 'Email',
               labelText: 'Email',
@@ -85,7 +90,9 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
           TextFormField(
             obscureText: true,
             decoration: InputDecoration(
-              errorText: _userViewModel.passwordErrorMessage.isNotEmpty ? _userViewModel.passwordErrorMessage : null,
+              errorText: _userViewModel.passwordErrorMessage.isNotEmpty
+                  ? _userViewModel.passwordErrorMessage
+                  : null,
               prefixIcon: const Icon(Icons.password),
               hintText: 'Şifre',
               labelText: 'Şifre',
@@ -113,24 +120,23 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
   void _formSubmit(FormType formType) async {
     UserModel? entryUser;
     UserModel? createUser;
+    print('**************************************');
+    print(_globalFormKey.currentState!.validate());
     if (_globalFormKey.currentState!.validate()) {
       _globalFormKey.currentState!.save();
-      print(_formType);
       if (formType == FormType.LOGIN) {
-        entryUser = await _userViewModel.signInWithEmailAndPassword(_email!, _password!);
-        print(entryUser);
-        print('Giriş');
+        entryUser = await _userViewModel.signInWithEmailAndPassword(
+            _email!, _password!);
+        if (_formType == FormType.LOGIN && entryUser == null) {
+          _buildShowDialog('Kullanıcı bulunamadı');
+        }
       } else {
-        createUser = await _userViewModel.crateUserWithEmailAndPassword(_email!, _password!);
-        print(createUser);
-        print('Kayıt');
+        createUser = await _userViewModel.crateUserWithEmailAndPassword(
+            _email!, _password!);
+        if (_formType == FormType.REGISTER && createUser == null) {
+          _buildShowDialog('Kullanıcı zaten kayıtlı');
+        }
       }
-    }
-    if (_formType == FormType.REGISTER && createUser == null) {
-      _buildShowDialog('Kullanıcı zaten kayıtlı');
-    }
-    if (_formType == FormType.LOGIN && entryUser == null) {
-      _buildShowDialog('Kullanıcı bulunamadı');
     }
   }
 
@@ -143,7 +149,9 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
             leading: const Icon(Icons.warning),
             title: const Text('Uyarı !'),
             subtitle: Text(message),
-            trailing: IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.done)),
+            trailing: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.done)),
           ),
         );
       },
