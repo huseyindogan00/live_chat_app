@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/firestore_db_service.dart';
@@ -16,6 +15,8 @@ class UserRepository implements AuthBase {
   final FirestoreDbService _firebaseDbService = locator<FirestoreDbService>();
 
   AppMode appMode = UserViewModel.appMode;
+
+  ///Herhani bir kullanıcının olup olmamasını kontrol eder.
   @override
   UserModel? currentUser() {
     if (appMode == AppMode.DEBUG) {
@@ -45,30 +46,52 @@ class UserRepository implements AuthBase {
 
   @override
   Future<UserModel?> signInWithGmail() async {
-    return await _firebaseAuthService.signInWithGmail();
+    UserModel? _userModel = await _firebaseAuthService.signInWithGmail();
+
+    if (_userModel != null) {
+      bool result = await _firebaseDbService.saveUser(_userModel);
+
+      _userModel = await _firebaseDbService.readUser(_userModel.userID!);
+    }
+    return _userModel;
   }
 
+  @Deprecated('Facebook ile bağlantı başarısız oldu. Gerekli bağlantılar yapılacaktır.')
   @override
   Future<UserModel?> signInWithFacebook() async {
     return await _firebaseAuthService.signInWithFacebook();
   }
 
+  ///
+  ///Verilen `email` ve `password` bilgilerini   Firebase Authentication ve Firestore kayıt eder.
+  ///
+  ///Kaydedilen kullanıcı bilgilerini Firestore'dan okuyarak geriye UserModel döner.
   @override
   Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) async {
     UserModel? _userModel = await _firebaseAuthService.crateUserWithEmailAndPassword(email, password);
-    print(_userModel);
+
     if (_userModel != null) {
       bool result = await _firebaseDbService.saveUser(_userModel);
 
       if (result) {
+        await _firebaseDbService.readUser(_userModel.userID!);
         return _userModel;
       }
     }
     return null;
   }
 
+  ///
+  ///Verilen `email` ve `password` bilgisini Firebase Authentication da olup olmadığını kontrol eder.
+  ///
+  ///Eğer bilgiler doğruysa, Firestore'dan mevcut kullanıcı bilgilerini okur ve geriye UserModel döner.
   @override
   Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
-    return await _firebaseAuthService.signInWithEmailAndPassword(email, password);
+    UserModel? _userModel = await _firebaseAuthService.signInWithEmailAndPassword(email, password);
+
+    if (_userModel != null) {
+      _userModel = await _firebaseDbService.readUser(_userModel.userID!);
+    }
+    return _userModel;
   }
 }

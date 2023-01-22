@@ -1,19 +1,18 @@
 import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserModel {
   String? userID;
   String? email;
-  String? name;
+  String? userName;
   String? phoneNumber;
   String? photoUrl;
   dynamic createAt;
   UserModel({
     this.userID,
     this.email,
-    this.name,
+    this.userName,
     this.phoneNumber,
     this.photoUrl,
     this.createAt,
@@ -22,15 +21,15 @@ class UserModel {
   UserModel copyWith({
     String? userID,
     String? email,
-    String? name,
+    String? userName,
     String? phoneNumber,
     String? photoUrl,
-    dynamic? createAt,
+    dynamic createAt,
   }) {
     return UserModel(
       userID: userID ?? this.userID,
       email: email ?? this.email,
-      name: name ?? this.name,
+      userName: userName ?? this.userName,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       createAt: createAt ?? this.createAt,
@@ -41,7 +40,7 @@ class UserModel {
     return <String, dynamic>{
       'userID': userID,
       'email': email,
-      'name': name,
+      'userName': userName ?? email!.split('@')[0] + Random().nextInt(10000).toString(),
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'createAt': createAt,
@@ -52,7 +51,7 @@ class UserModel {
     return UserModel(
       userID: map['userID'] != null ? map['userID'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
-      name: map['name'] != null ? map['name'] as String : null,
+      userName: map['userName'] != null ? map['userName'] as String : null,
       phoneNumber: map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
       photoUrl: map['photoUrl'] != null ? map['photoUrl'] as String : null,
       createAt: map['createAt'] as dynamic,
@@ -65,7 +64,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userID: $userID, email: $email, name: $name, phoneNumber: $phoneNumber, photoUrl: $photoUrl, createAt: $createAt)';
+    return 'UserModel(userID: $userID, email: $email, userName: $userName, phoneNumber: $phoneNumber, photoUrl: $photoUrl, createAt: $createAt)';
   }
 
   @override
@@ -74,7 +73,7 @@ class UserModel {
 
     return other.userID == userID &&
         other.email == email &&
-        other.name == name &&
+        other.userName == userName &&
         other.phoneNumber == phoneNumber &&
         other.photoUrl == photoUrl &&
         other.createAt == createAt;
@@ -84,7 +83,7 @@ class UserModel {
   int get hashCode {
     return userID.hashCode ^
         email.hashCode ^
-        name.hashCode ^
+        userName.hashCode ^
         phoneNumber.hashCode ^
         photoUrl.hashCode ^
         createAt.hashCode;

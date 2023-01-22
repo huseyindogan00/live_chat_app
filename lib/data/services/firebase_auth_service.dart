@@ -71,7 +71,7 @@ class FirebaseAuthService implements AuthBase {
         return UserModel(
           userID: userCredential.user?.uid,
           email: userCredential.user?.email,
-          name: userCredential.user?.displayName,
+          userName: userCredential.user?.displayName,
           phoneNumber: userCredential.user?.phoneNumber,
           photoUrl: userCredential.user?.photoURL,
         );
@@ -94,7 +94,7 @@ class FirebaseAuthService implements AuthBase {
           return UserModel(
             email: firebaseResult.user!.email,
             photoUrl: firebaseResult.user!.photoURL,
-            name: firebaseResult.user!.displayName,
+            userName: firebaseResult.user!.displayName,
           );
         }
         //final profile = await _fb.getUserProfile();
@@ -119,7 +119,7 @@ class FirebaseAuthService implements AuthBase {
     if (_userCredential.user != null) {
       return UserModel(
         email: _userCredential.user!.email,
-        name: _userCredential.user!.displayName,
+        userName: _userCredential.user!.displayName,
         phoneNumber: _userCredential.user!.phoneNumber,
         photoUrl: _userCredential.user!.photoURL,
         userID: _userCredential.user!.uid,
@@ -136,7 +136,7 @@ class FirebaseAuthService implements AuthBase {
     if (_userCredential.user != null) {
       return UserModel(
         email: _userCredential.user!.email,
-        name: _userCredential.user!.displayName,
+        userName: _userCredential.user!.displayName,
         phoneNumber: _userCredential.user!.phoneNumber,
         photoUrl: _userCredential.user!.photoURL,
         userID: _userCredential.user!.uid,

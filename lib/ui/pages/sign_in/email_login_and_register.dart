@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:live_chat_app/ui/pages/sign_in/sign_in_screen.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:live_chat_app/ui/widgets/button/login_button.dart';

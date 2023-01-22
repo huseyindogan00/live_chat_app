@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
-import 'package:live_chat_app/ui/pages/splash_screen.dart';
+import 'package:live_chat_app/ui/pages/start/splash_screen.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -30,3 +30,8 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+/**
+ * 
+ */

@@ -3,6 +3,7 @@ import 'package:live_chat_app/data/services/interface/auth_base.dart';
 
 class FakeAuthService implements AuthBase {
   String userID = '121121212321321321321312323';
+
   @override
   UserModel currentUser() {
     return UserModel(userID: userID);

@@ -97,6 +97,7 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   Future<UserModel?> signInWithFacebook() async {
     try {
       state = ViewState.Busy;
+      // ignore: deprecated_member_use_from_same_package
       _userModel = await _userRepository.signInWithFacebook();
     } catch (e) {
       print(e);

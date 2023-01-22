@@ -3,12 +3,31 @@ import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/interface/database_base.dart';
 
 class FirestoreDbService implements DBBase {
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  ///UserModel'i Firebase veritabanına kaydeder.
   @override
   Future<bool> saveUser(UserModel userModel) async {
     userModel.createAt = FieldValue.serverTimestamp();
-    await firestore.collection('users').doc(userModel.userID).set(userModel.toMap());
+
+    await _firestore.collection('users').doc(userModel.userID).set(userModel.toMap());
+/* 
+    DocumentSnapshot snapshot = await _firestore.doc('users/${userModel.userID}').get();
+    Map<String, dynamic> _readUser = snapshot.data() as Map<String, dynamic>;
+    UserModel result = UserModel.fromMap(_readUser);   */
 
     return true;
+  }
+
+  /// Verilen userID'ye ait User'ı Firebase'den getirerek UserModel nesnesine dönüştürür ve geriye UserModel döner.
+  @override
+  Future<UserModel> readUser(String userID) async {
+    DocumentSnapshot _readUserSapshot = await _firestore.collection('users').doc(userID).get();
+
+    Map<String, dynamic> _readUserMap = _readUserSapshot.data() as Map<String, dynamic>;
+
+    UserModel userModel = UserModel.fromMap(_readUserMap);
+
+    return userModel;
   }
 }
