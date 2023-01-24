@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:live_chat_app/ui/widgets/button/login_button.dart';
 import 'package:provider/provider.dart';
@@ -45,23 +46,7 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
     );
   }
 
-  Widget _buildFormRegister(FormType formType) {
-    return TextButton(
-      onPressed: () async {
-        setState(() {
-          if (_formType == FormType.LOGIN) {
-            _formType = FormType.REGISTER;
-          } else {
-            _formType = FormType.LOGIN;
-          }
-        });
-      },
-      child: Text(_linkText!),
-    );
-  }
-
   Form _buildFormLogin(GlobalKey<FormState> key, FormType formType) {
-    //print(_userViewModel.state);
     return Form(
       key: key,
       child: Column(
@@ -110,6 +95,21 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
     );
   }
 
+  Widget _buildFormRegister(FormType formType) {
+    return TextButton(
+      onPressed: () async {
+        setState(() {
+          if (_formType == FormType.LOGIN) {
+            _formType = FormType.REGISTER;
+          } else {
+            _formType = FormType.LOGIN;
+          }
+        });
+      },
+      child: Text(_linkText!),
+    );
+  }
+
   // GİRİŞ BUTONUNA TIKLANDIĞI ZAMAN
   void _formSubmit(FormType formType) async {
     UserModel? entryUser;
@@ -119,7 +119,12 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
       if (formType == FormType.LOGIN) {
         entryUser = await _userViewModel.signInWithEmailAndPassword(_email!, _password!);
         if (_formType == FormType.LOGIN && entryUser == null) {
-          _buildShowDialog('Kullanıcı bulunamadı');
+          // ignore: use_build_context_synchronously
+          const PlatformSensitiveAlertDialog(
+            content: 'Kullanıcı bulunamadı.',
+            title: 'Uyarı!',
+            doneButtonTitle: 'Tamam',
+          ).show(context);
         }
       } else {
         createUser = await _userViewModel.crateUserWithEmailAndPassword(_email!, _password!);
@@ -133,6 +138,14 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
   Future<void> _buildShowDialog(String message) async {
     showDialog(
       context: context,
+      builder: (context) => PlatformSensitiveAlertDialog(
+        content: message,
+        title: 'Uyarı',
+        doneButtonTitle: 'Tamam',
+      ),
+    );
+    /*  showDialog(
+      context: context,
       builder: (context) {
         return Dialog(
           child: ListTile(
@@ -143,7 +156,7 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
           ),
         );
       },
-    );
+    ); */
   }
 }
 
