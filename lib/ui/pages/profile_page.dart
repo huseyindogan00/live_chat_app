@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -23,9 +24,20 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Future<bool> doExit(BuildContext context) async {
+  Future<void> doExit(BuildContext context) async {
     final _userModel = Provider.of<UserViewModel>(context, listen: false);
-    bool result = await _userModel.signOut();
-    return result;
+
+    bool? result = await const PlatformSensitiveAlertDialog(
+      content: 'Oturumu kapatmak istedğinizden emin misiniz?',
+      title: 'UYARI!',
+      doneButtonTitle: 'Evet',
+      cancelButtonTitle: 'İptal',
+    ).show(context);
+
+    print(result);
+
+    if (result != null && result) {
+      await _userModel.signOut();
+    }
   }
 }

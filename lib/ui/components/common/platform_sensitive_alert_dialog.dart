@@ -20,14 +20,14 @@ class PlatformSensitiveAlertDialog extends BaseComponents {
     this.cancelButtonTitle,
   });
 
-  Future<bool> show(BuildContext context) async {
+  Future<bool?> show(BuildContext context) async {
     return Platform.isIOS
-        ? await showCupertinoDialog(
+        ? await showCupertinoDialog<bool?>(
             context: context,
             builder: (context) => this,
             barrierDismissible: false,
           )
-        : showDialog(
+        : await showDialog<bool?>(
             context: context,
             builder: (context) => this,
             barrierDismissible: false,
@@ -67,19 +67,19 @@ class PlatformSensitiveAlertDialog extends BaseComponents {
       allButton.add(
         CupertinoDialogAction(
           child: Text(doneButtonTitle),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop<bool>(context, true),
         ),
       );
     } else if (Platform.isAndroid) {
       if (cancelButtonTitle != null) {
-        allButton.add(CupertinoDialogAction(
+        allButton.add(TextButton(
           child: Text(cancelButtonTitle!),
           onPressed: () => Navigator.pop(context),
         ));
       }
       allButton.add(
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop<bool>(context, true),
           child: Text(doneButtonTitle),
         ),
       );
