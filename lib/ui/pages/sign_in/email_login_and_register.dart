@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live_chat_app/core/product/constant/dialog_action_text.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
@@ -118,45 +119,25 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
       _globalFormKey.currentState!.save();
       if (formType == FormType.LOGIN) {
         entryUser = await _userViewModel.signInWithEmailAndPassword(_email!, _password!);
-        if (_formType == FormType.LOGIN && entryUser == null) {
+        if (entryUser == null) {
           // ignore: use_build_context_synchronously
           const PlatformSensitiveAlertDialog(
-            content: 'Kullanıcı bulunamadı.',
+            content: 'Kullanıcı bulunamadı ya da şifre yanlış.',
             title: 'Uyarı!',
-            doneButtonTitle: 'Tamam',
+            doneButtonTitle: DialogActionText.done,
           ).show(context);
         }
       } else {
         createUser = await _userViewModel.crateUserWithEmailAndPassword(_email!, _password!);
         if (_formType == FormType.REGISTER && createUser == null) {
-          _buildShowDialog('Kullanıcı zaten kayıtlı');
+          const PlatformSensitiveAlertDialog(
+            content: 'Kullanıcı zaten kayıtlı, lütfen giriş yapınız.',
+            title: 'Uyarı!',
+            doneButtonTitle: DialogActionText.done,
+          );
         }
       }
     }
-  }
-
-  Future<void> _buildShowDialog(String message) async {
-    showDialog(
-      context: context,
-      builder: (context) => PlatformSensitiveAlertDialog(
-        content: message,
-        title: 'Uyarı',
-        doneButtonTitle: 'Tamam',
-      ),
-    );
-    /*  showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          child: ListTile(
-            leading: const Icon(Icons.warning),
-            title: const Text('Uyarı !'),
-            subtitle: Text(message),
-            trailing: IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.done)),
-          ),
-        );
-      },
-    ); */
   }
 }
 

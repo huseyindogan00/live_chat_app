@@ -24,13 +24,13 @@ class SignInScreen extends StatelessWidget {
             UserViewModel.appMode == AppMode.DEBUG ? 'DEBUG MOD ' : 'RELEASE MOD',
             textAlign: TextAlign.center,
           ),
-          Switch(
+          /* Switch(
             value: _userViewModel.appModeState,
             activeColor: const Color.fromARGB(255, 209, 162, 161),
             onChanged: (value) {
               _userViewModel.changeAppMode(value);
             },
-          ),
+          ), */
         ],
       ),
       backgroundColor: Colors.grey.shade200,

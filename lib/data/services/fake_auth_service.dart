@@ -5,7 +5,7 @@ class FakeAuthService implements AuthBase {
   String userID = '121121212321321321321312323';
 
   @override
-  UserModel currentUser() {
+  Future<UserModel> currentUser() async {
     return UserModel(userID: userID);
   }
 

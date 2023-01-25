@@ -18,12 +18,12 @@ class UserRepository implements AuthBase {
 
   ///Herhani bir kullanıcının olup olmamasını kontrol eder.
   @override
-  UserModel? currentUser() {
-    if (appMode == AppMode.DEBUG) {
-      return _fakeAuthService.currentUser();
-    } else {
-      return _firebaseAuthService.currentUser();
+  Future<UserModel?> currentUser() async {
+    UserModel? userModel = await _firebaseAuthService.currentUser();
+    if (userModel != null) {
+      return await _firebaseDbService.readUser(userModel.userID!);
     }
+    return null;
   }
 
   @override
@@ -88,7 +88,6 @@ class UserRepository implements AuthBase {
   @override
   Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
     UserModel? _userModel = await _firebaseAuthService.signInWithEmailAndPassword(email, password);
-
     if (_userModel != null) {
       _userModel = await _firebaseDbService.readUser(_userModel.userID!);
     }

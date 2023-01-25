@@ -11,7 +11,7 @@ import 'package:live_chat_app/data/services/interface/auth_base.dart';
 class FirebaseAuthService implements AuthBase {
   final FirebaseAuth _firebaseAuthService = FirebaseAuth.instance;
   @override
-  UserModel? currentUser() {
+  Future<UserModel?> currentUser() async {
     UserModel? _userModel;
     try {
       User? user = _firebaseAuthService.currentUser;
