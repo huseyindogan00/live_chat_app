@@ -37,11 +37,20 @@ class UserViewModel with ChangeNotifier implements AuthBase {
 
   ViewState get state => _state;
 
+  void updateUserName(String userName) async {
+    /* 
+      1 - username kontrolü yapıldıktan sonra firestorede güncelleme yapılacak
+      2 - 
+    
+    
+     */
+  }
+
   @override
-  UserModel? currentUser() {
+  Future<UserModel?> currentUser() async {
     try {
       state = ViewState.Busy;
-      _userModel = _userRepository.currentUser();
+      _userModel = await _userRepository.currentUser();
     } catch (e) {
       debugPrint(e.toString());
       return null;
@@ -134,7 +143,7 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     return _userModel;
   }
 
-  // password validation yapar
+  // password kontrolü yapar
   String? passwordControl(String? value) {
     if (value != null && value.isNotEmpty) {
       if (value.length < 6) {
@@ -146,7 +155,7 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  // email validation yapar
+  // email kontolü yapar
   String? emailControl(String? value) {
     if (value != null && value.isNotEmpty) {
       if (!value.contains('@')) {
@@ -159,10 +168,10 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   // DEBUG(hata ayıklama)  ve RELEASE(yayınlama) modları arasında geçişi kontrol eder
-  void changeAppMode(bool value) {
+  /* void changeAppMode(bool value) {
     _appModeState = value;
     _userRepository.appMode = _appModeState ? AppMode.RELEASE : AppMode.DEBUG;
     appMode = _appModeState ? AppMode.RELEASE : AppMode.DEBUG;
     notifyListeners();
-  }
+  } */
 }
