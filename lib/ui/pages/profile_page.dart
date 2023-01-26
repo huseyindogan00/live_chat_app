@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:live_chat_app/core/product/constant/dialog_action_text.dart';
+import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:live_chat_app/ui/widgets/button/login_button.dart';
 import 'package:provider/provider.dart';
+import 'dart:io';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -15,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController controllerUsername;
   late GlobalKey<FormFieldState> textFormKey;
+  XFile? _profilePhoto;
 
   @override
   void initState() {
@@ -51,47 +55,122 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                backgroundImage: userViewModel.userModel?.photoUrl == null
-                    ? const NetworkImage('https://picsum.photos/200')
-                    : NetworkImage(userViewModel.userModel!.photoUrl!),
-                radius: 75,
-              ),
+              _buildProfilePhoto(userViewModel),
               const SizedBox(height: 20),
-              TextFormField(
-                initialValue: userViewModel.userModel!.email,
-                readOnly: true,
-                decoration: const InputDecoration(labelText: 'Email adresiniz', border: OutlineInputBorder()),
-              ),
+              _buildTextFormEmail(userViewModel),
               const SizedBox(height: 20),
-              TextFormField(
-                key: textFormKey,
-                controller: controllerUsername,
-                validator: (_) {
-                  if (controllerUsername.text.isEmpty) {
-                    return 'Username boş olamaz';
-                  } else if (userViewModel.userModel!.userName == controllerUsername.text) {
-                    return 'Username alanı aynı';
-                  }
-                  return null;
-                },
-                readOnly: false,
-                decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
-              ),
+              _buildTextFormUserName(userViewModel),
               const SizedBox(height: 20),
               LoginButton(
                 buttonTextWidget: const Text('Değişikleri Kaydet'),
                 buttonColor: Colors.purple,
-                onPressed: () async {
-                  if (textFormKey.currentState!.validate()) {
-                    userViewModel.updateUserName(controllerUsername.text);
-                  }
-                },
+                onPressed: () async => await _buildSaveChangeButton(userViewModel, context),
               )
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _buildSaveChangeButton(UserViewModel userViewModel, BuildContext context) async {
+    if (textFormKey.currentState!.validate()) {
+      bool result = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
+      if (_profilePhoto != null) {
+        var url = await userViewModel.uploadFile(
+            userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
+        print(url);
+      }
+
+      if (result == true) {
+        // ignore: use_build_context_synchronously
+        const PlatformSensitiveAlertDialog(
+          content: 'Kullanıcı güncelleme işlemleri başarılı.',
+          title: 'Bilgi',
+          doneButtonTitle: DialogActionText.done,
+        ).show(context);
+      }
+    }
+  }
+
+  TextFormField _buildTextFormUserName(UserViewModel userViewModel) {
+    return TextFormField(
+      key: textFormKey,
+      controller: controllerUsername,
+      validator: (_) {
+        if (controllerUsername.text.isEmpty) {
+          return 'Username boş olamaz';
+        } else if (userViewModel.userModel!.userName == controllerUsername.text) {
+          return 'Username alanı aynı';
+        }
+        return null;
+      },
+      readOnly: false,
+      decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
+    );
+  }
+
+  TextFormField _buildTextFormEmail(UserViewModel userViewModel) {
+    return TextFormField(
+      initialValue: userViewModel.userModel!.email,
+      readOnly: true,
+      decoration: const InputDecoration(labelText: 'Email adresiniz', border: OutlineInputBorder()),
+    );
+  }
+
+  Widget _buildProfilePhoto(UserViewModel userViewModel) {
+    return Stack(
+      children: [
+        _profilePhoto == null
+            ? CircleAvatar(
+                backgroundImage: userViewModel.userModel?.photoUrl == null
+                    ? const NetworkImage('https://picsum.photos/200')
+                    : NetworkImage(userViewModel.userModel!.photoUrl!),
+                radius: 75,
+              )
+            : CircleAvatar(
+                backgroundImage: FileImage(File(_profilePhoto!.path)),
+                radius: 75,
+              ),
+        Positioned(
+          right: -13,
+          top: -13,
+          child: IconButton(
+            icon: const Icon(Icons.add_a_photo),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return SizedBox(
+                    height: 200,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.camera_alt),
+                          title: const Text('Kameradan çek'),
+                          onTap: () {
+                            _buildTakePhoto();
+                            Navigator.pop(context);
+                          },
+                        ),
+                        const Divider(),
+                        ListTile(
+                          leading: const Icon(Icons.image),
+                          title: const Text('Galeriden getir'),
+                          onTap: () {
+                            _buildGetGallery();
+                            Navigator.pop(context);
+                          },
+                        )
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        )
+      ],
     );
   }
 
@@ -105,10 +184,25 @@ class _ProfilePageState extends State<ProfilePage> {
       cancelButtonTitle: DialogActionText.cancel,
     ).show(context);
 
-    print(result);
-
     if (result != null && result) {
       await _userModel.signOut();
     }
+  }
+
+  _buildGetGallery() async {
+    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
+    setState(() {
+      _profilePhoto = newProfilePhoto;
+      print(_profilePhoto!.path);
+    });
+  }
+
+  _buildTakePhoto() async {
+    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    setState(() {
+      _profilePhoto = newProfilePhoto;
+      print(_profilePhoto!.path);
+    });
   }
 }

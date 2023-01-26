@@ -1,9 +1,13 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'dart:io';
+
+import 'package:cross_file/src/types/interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/data/user_repository.dart';
 import 'package:live_chat_app/data/services/interface/auth_base.dart';
 
@@ -35,16 +39,16 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     notifyListeners();
   }
 
-  ViewState get state => _state;
-
-  void updateUserName(String userName) async {
-    /* 
-      1 - username kontrolü yapıldıktan sonra firestorede güncelleme yapılacak
-      2 - 
-    
-    
-     */
+  /// Verilen username güncelleme işlemlerinin
+  Future<bool> updateUserName(String userID, String newUserName) async {
+    bool result = await _userRepository.updateUserName(userID, newUserName);
+    if (result) {
+      _userModel!.userName = newUserName;
+    }
+    return result;
   }
+
+  ViewState get state => _state;
 
   @override
   Future<UserModel?> currentUser() async {
@@ -167,11 +171,7 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  // DEBUG(hata ayıklama)  ve RELEASE(yayınlama) modları arasında geçişi kontrol eder
-  /* void changeAppMode(bool value) {
-    _appModeState = value;
-    _userRepository.appMode = _appModeState ? AppMode.RELEASE : AppMode.DEBUG;
-    appMode = _appModeState ? AppMode.RELEASE : AppMode.DEBUG;
-    notifyListeners();
-  } */
+  Future<String> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) {
+    return _userRepository.uploadFile(userID, fileType, fileToUpload);
+  }
 }

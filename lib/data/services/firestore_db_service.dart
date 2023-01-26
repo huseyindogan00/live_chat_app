@@ -30,4 +30,20 @@ class FirestoreDbService implements DBBase {
 
     return userModel;
   }
+
+  @override
+  Future<bool> updateUserName(String userID, String newUserName) async {
+    QuerySnapshot result = await _firestore.collection('users').where('userName', isEqualTo: newUserName).get();
+    if (result.docs.isEmpty) {
+      await _firestore.collection('users').doc(userID).update({'userName': newUserName});
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> updatePhotoUrl(String userID, String url) async {
+    await _firestore.collection('users/$userID').doc().update({'photoUrl': url});
+    return true;
+  }
 }

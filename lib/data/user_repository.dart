@@ -1,20 +1,20 @@
+import 'dart:io';
+
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/data/services/firestore_db_service.dart';
 import 'package:live_chat_app/data/services/interface/auth_base.dart';
 import 'package:live_chat_app/data/services/fake_auth_service.dart';
 import 'package:live_chat_app/data/services/firebase_auth_service.dart';
-import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 
 // ignore: constant_identifier_names
 enum AppMode { DEBUG, RELEASE }
 
 class UserRepository implements AuthBase {
   final FirebaseAuthService _firebaseAuthService = locator<FirebaseAuthService>();
-  final FakeAuthService _fakeAuthService = locator<FakeAuthService>();
   final FirestoreDbService _firebaseDbService = locator<FirestoreDbService>();
-
-  AppMode appMode = UserViewModel.appMode;
+  final FirebaseStorageService _firebaseStorageService = locator<FirebaseStorageService>();
 
   ///Herhani bir kullanıcının olup olmamasını kontrol eder.
   @override
@@ -28,20 +28,12 @@ class UserRepository implements AuthBase {
 
   @override
   Future<UserModel> signInAnonymously() async {
-    if (appMode == AppMode.DEBUG) {
-      return await _fakeAuthService.signInAnonymously();
-    } else {
-      return await _firebaseAuthService.signInAnonymously();
-    }
+    return await _firebaseAuthService.signInAnonymously();
   }
 
   @override
   Future<bool> signOut() async {
-    if (appMode == AppMode.DEBUG) {
-      return await _fakeAuthService.signOut();
-    } else {
-      return await _firebaseAuthService.signOut();
-    }
+    return await _firebaseAuthService.signOut();
   }
 
   @override
@@ -92,5 +84,15 @@ class UserRepository implements AuthBase {
       _userModel = await _firebaseDbService.readUser(_userModel.userID!);
     }
     return _userModel;
+  }
+
+  Future<bool> updateUserName(String userID, String newUserName) async {
+    return await _firebaseDbService.updateUserName(userID, newUserName);
+  }
+
+  Future<String> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) async {
+    String url = await _firebaseStorageService.uploadFile(userID!, fileType, fileToUpload);
+    await _firebaseDbService.updatePhotoUrl(userID, url);
+    return '';
   }
 }
