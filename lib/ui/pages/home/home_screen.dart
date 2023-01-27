@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
-import 'package:live_chat_app/ui/pages/profile_page.dart';
-import 'package:live_chat_app/ui/pages/users_page.dart';
+import 'package:live_chat_app/ui/pages/profile/profile_page.dart';
+import 'package:live_chat_app/ui/pages/user/users_page.dart';
 import 'package:live_chat_app/ui/widgets/bottom_navi/my_custom_bottom_navi.dart';
 import 'package:live_chat_app/ui/widgets/bottom_navi/tab_item.dart';
 
@@ -36,7 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     //final _userViewModel = Provider.of<UserViewModel>(context);
     return WillPopScope(
-      onWillPop: () async => await navigatorKeys[_currentTab]!.currentState!.maybePop(),
+      onWillPop: () async =>
+          await navigatorKeys[_currentTab]!.currentState!.maybePop(),
       child: MyCustomBottomNavigator(
         navigatorKeys: navigatorKeys,
         currentTab: _currentTab,
@@ -44,7 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onSelectedTab: (selectedTab) {
           if (selectedTab == _currentTab) {
             if (navigatorKeys[selectedTab]!.currentState != null) {
-              navigatorKeys[selectedTab]!.currentState!.popUntil((route) => route.isFirst);
+              navigatorKeys[selectedTab]!
+                  .currentState!
+                  .popUntil((route) => route.isFirst);
             }
           } else {
             setState(() {

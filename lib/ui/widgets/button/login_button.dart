@@ -18,7 +18,7 @@ class LoginButton extends StatelessWidget {
   final double buttonRadius;
   final double buttonHeight;
   final Widget? buttonIcon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +58,3 @@ class LoginButton extends StatelessWidget {
     );
   }
 }
-
-/* 
-buttonIcon!,
-              Text(
-                buttonText,
-                style: TextStyle(color: textColor),
-              ),
-              const SizedBox(),
-               */

@@ -1,10 +1,8 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/ui/pages/sign_in/email_login_and_register.dart';
 import 'package:live_chat_app/core/product/constant/app_icons.dart';
-import 'package:live_chat_app/data/user_repository.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:live_chat_app/ui/widgets/button/login_button.dart';
 import 'package:provider/provider.dart';
@@ -19,19 +17,6 @@ class SignInScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Flutter Live Chat'),
         elevation: 0,
-        actions: [
-          Text(
-            UserViewModel.appMode == AppMode.DEBUG ? 'DEBUG MOD ' : 'RELEASE MOD',
-            textAlign: TextAlign.center,
-          ),
-          /* Switch(
-            value: _userViewModel.appModeState,
-            activeColor: const Color.fromARGB(255, 209, 162, 161),
-            onChanged: (value) {
-              _userViewModel.changeAppMode(value);
-            },
-          ), */
-        ],
       ),
       backgroundColor: Colors.grey.shade200,
       body: Padding(
@@ -62,16 +47,15 @@ class SignInScreen extends StatelessWidget {
             LoginButton(
               buttonTextWidget: const Text('Facebook ile Oturum Aç'),
               buttonColor: const Color(0xFF334D92),
-              onPressed: () async {
-                //await _userViewModel.signInWithFacebook();
-              },
+              onPressed: () => null,
+              //await _userViewModel.signInWithFacebook();
               buttonIcon: Image.asset(AppIcons.facebook),
             ),
             LoginButton(
               buttonTextWidget: const Text('Email ve Şifre ile Giriş Yap'),
               buttonColor: Colors.purple,
-              onPressed: () {
-                Navigator.of(context).push(
+              onPressed: () async {
+                bool? result = await Navigator.of(context).push<bool>(
                   MaterialPageRoute(
                     builder: (context) => const EmailLoginAndRegister(),
                   ),

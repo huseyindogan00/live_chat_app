@@ -42,10 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: const Text('Profil'),
         actions: [
-          IconButton(
-            onPressed: () => doExit(context),
-            icon: const Icon(Icons.logout),
-          ),
+          _buildExitIconButton(context),
         ],
       ),
       body: SingleChildScrollView(
@@ -64,7 +61,8 @@ class _ProfilePageState extends State<ProfilePage> {
               LoginButton(
                 buttonTextWidget: const Text('Değişikleri Kaydet'),
                 buttonColor: Colors.purple,
-                onPressed: () async => await _buildSaveChangeButton(userViewModel, context),
+                onPressed: () async =>
+                    await _buildSaveChangeButton(userViewModel, context),
               )
             ],
           ),
@@ -73,12 +71,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _buildSaveChangeButton(UserViewModel userViewModel, BuildContext context) async {
+  IconButton _buildExitIconButton(BuildContext context) {
+    return IconButton(
+      onPressed: () => doExit(context),
+      icon: const Icon(Icons.logout),
+    );
+  }
+
+  Future<void> _buildSaveChangeButton(
+      UserViewModel userViewModel, BuildContext context) async {
     if (textFormKey.currentState!.validate()) {
-      bool result = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
+      bool result = await userViewModel.updateUserName(
+          userViewModel.userModel!.userID!, controllerUsername.text);
       if (_profilePhoto != null) {
         var url = await userViewModel.uploadFile(
-            userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
+            userViewModel.userModel!.userID,
+            StrorageFileEnum.ProfilePhoto,
+            File(_profilePhoto!.path));
         print(url);
       }
 
@@ -100,13 +109,12 @@ class _ProfilePageState extends State<ProfilePage> {
       validator: (_) {
         if (controllerUsername.text.isEmpty) {
           return 'Username boş olamaz';
-        } else if (userViewModel.userModel!.userName == controllerUsername.text) {
-          return 'Username alanı aynı';
         }
         return null;
       },
       readOnly: false,
-      decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
+      decoration: const InputDecoration(
+          labelText: 'Username', border: OutlineInputBorder()),
     );
   }
 
@@ -114,7 +122,8 @@ class _ProfilePageState extends State<ProfilePage> {
     return TextFormField(
       initialValue: userViewModel.userModel!.email,
       readOnly: true,
-      decoration: const InputDecoration(labelText: 'Email adresiniz', border: OutlineInputBorder()),
+      decoration: const InputDecoration(
+          labelText: 'Email adresiniz', border: OutlineInputBorder()),
     );
   }
 
@@ -190,7 +199,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _buildGetGallery() async {
-    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
+    var newProfilePhoto =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       _profilePhoto = newProfilePhoto;
       print(_profilePhoto!.path);
@@ -198,7 +208,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _buildTakePhoto() async {
-    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.camera);
+    var newProfilePhoto =
+        await ImagePicker().pickImage(source: ImageSource.camera);
 
     setState(() {
       _profilePhoto = newProfilePhoto;
