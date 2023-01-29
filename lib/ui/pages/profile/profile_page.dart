@@ -61,8 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
               LoginButton(
                 buttonTextWidget: const Text('Değişikleri Kaydet'),
                 buttonColor: Colors.purple,
-                onPressed: () async =>
-                    await _buildSaveChangeButton(userViewModel, context),
+                onPressed: () async => await _buildSaveChangeButton(userViewModel, context),
               )
             ],
           ),
@@ -78,27 +77,23 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _buildSaveChangeButton(
-      UserViewModel userViewModel, BuildContext context) async {
+  Future<void> _buildSaveChangeButton(UserViewModel userViewModel, BuildContext context) async {
+    bool? isUrlSave;
+    bool isUserNameSave;
+
     if (textFormKey.currentState!.validate()) {
-      bool result = await userViewModel.updateUserName(
-          userViewModel.userModel!.userID!, controllerUsername.text);
+      isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
       if (_profilePhoto != null) {
-        var url = await userViewModel.uploadFile(
-            userViewModel.userModel!.userID,
-            StrorageFileEnum.ProfilePhoto,
-            File(_profilePhoto!.path));
-        print(url);
+        isUrlSave = await userViewModel.uploadFile(
+            userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
       }
 
-      if (result == true) {
-        // ignore: use_build_context_synchronously
-        const PlatformSensitiveAlertDialog(
-          content: 'Kullanıcı güncelleme işlemleri başarılı.',
-          title: 'Bilgi',
-          doneButtonTitle: DialogActionText.done,
-        ).show(context);
-      }
+      // ignore: use_build_context_synchronously
+      PlatformSensitiveAlertDialog(
+        content: (isUrlSave! || isUserNameSave) ? 'Kullanıcı güncelleme işlemleri başarılı.' : 'Başarısız',
+        title: 'Bilgi',
+        doneButtonTitle: DialogActionText.done,
+      ).show(context);
     }
   }
 
@@ -113,8 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
         return null;
       },
       readOnly: false,
-      decoration: const InputDecoration(
-          labelText: 'Username', border: OutlineInputBorder()),
+      decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
     );
   }
 
@@ -122,8 +116,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return TextFormField(
       initialValue: userViewModel.userModel!.email,
       readOnly: true,
-      decoration: const InputDecoration(
-          labelText: 'Email adresiniz', border: OutlineInputBorder()),
+      decoration: const InputDecoration(labelText: 'Email adresiniz', border: OutlineInputBorder()),
     );
   }
 
@@ -199,8 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _buildGetGallery() async {
-    var newProfilePhoto =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       _profilePhoto = newProfilePhoto;
       print(_profilePhoto!.path);
@@ -208,8 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _buildTakePhoto() async {
-    var newProfilePhoto =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.camera);
 
     setState(() {
       _profilePhoto = newProfilePhoto;

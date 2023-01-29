@@ -7,6 +7,7 @@ class FirebaseStorageService implements StorageBase {
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   Reference? _storageReference;
 
+  /// Kaydedilen dosyanın URL linkini geriye döner.
   @override
   Future<String> uploadFile(String userID, StrorageFileEnum fileType, File fileToUpload) async {
     _storageReference = _firebaseStorage
@@ -17,15 +18,7 @@ class FirebaseStorageService implements StorageBase {
 
     UploadTask uploadTask = _storageReference!.putFile(fileToUpload);
 
-    String url = await uploadTask.snapshot.storage.ref().getDownloadURL();
-
-    print('*********************************************');
-    print(url);
-    /**
-     * RESMİN URL ADRESİ GELMİYOR..............
-     * 
-     * 
-     */
+    String url = await _storageReference!.getDownloadURL() ?? uploadTask.snapshot.ref.getDownloadURL().toString();
 
     return url;
   }

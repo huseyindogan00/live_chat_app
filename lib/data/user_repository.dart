@@ -12,11 +12,9 @@ import 'package:live_chat_app/data/services/firebase_auth_service.dart';
 enum AppMode { DEBUG, RELEASE }
 
 class UserRepository implements AuthBase {
-  final FirebaseAuthService _firebaseAuthService =
-      locator<FirebaseAuthService>();
+  final FirebaseAuthService _firebaseAuthService = locator<FirebaseAuthService>();
   final FirestoreDbService _firebaseDbService = locator<FirestoreDbService>();
-  final FirebaseStorageService _firebaseStorageService =
-      locator<FirebaseStorageService>();
+  final FirebaseStorageService _firebaseStorageService = locator<FirebaseStorageService>();
 
   ///Herhani bir kullanıcının olup olmamasını kontrol eder.
   @override
@@ -50,8 +48,7 @@ class UserRepository implements AuthBase {
     return _userModel;
   }
 
-  @Deprecated(
-      'Facebook ile bağlantı başarısız oldu. Gerekli bağlantılar yapılacaktır.')
+  @Deprecated('Facebook ile bağlantı başarısız oldu. Gerekli bağlantılar yapılacaktır.')
   @override
   Future<UserModel?> signInWithFacebook() async {
     //return await _firebaseAuthService.signInWithFacebook();
@@ -62,10 +59,8 @@ class UserRepository implements AuthBase {
   ///
   ///Kaydedilen kullanıcı bilgilerini Firestore'dan okuyarak geriye UserModel döner.
   @override
-  Future<UserModel?> crateUserWithEmailAndPassword(
-      String email, String password) async {
-    UserModel? _userModel = await _firebaseAuthService
-        .crateUserWithEmailAndPassword(email, password);
+  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) async {
+    UserModel? _userModel = await _firebaseAuthService.crateUserWithEmailAndPassword(email, password);
 
     if (_userModel != null) {
       bool result = await _firebaseDbService.saveUser(_userModel);
@@ -83,10 +78,8 @@ class UserRepository implements AuthBase {
   ///
   ///Eğer bilgiler doğruysa, Firestore'dan mevcut kullanıcı bilgilerini okur ve geriye UserModel döner.
   @override
-  Future<UserModel?> signInWithEmailAndPassword(
-      String email, String password) async {
-    UserModel? _userModel =
-        await _firebaseAuthService.signInWithEmailAndPassword(email, password);
+  Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
+    UserModel? _userModel = await _firebaseAuthService.signInWithEmailAndPassword(email, password);
     if (_userModel != null) {
       _userModel = await _firebaseDbService.readUser(_userModel.userID!);
     }
@@ -97,11 +90,9 @@ class UserRepository implements AuthBase {
     return await _firebaseDbService.updateUserName(userID, newUserName);
   }
 
-  Future<String> uploadFile(
-      String? userID, StrorageFileEnum fileType, File fileToUpload) async {
-    String url = await _firebaseStorageService.uploadFile(
-        userID!, fileType, fileToUpload);
-    await _firebaseDbService.updatePhotoUrl(userID, url);
-    return '';
+  Future<bool> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) async {
+    String url = await _firebaseStorageService.uploadFile(userID!, fileType, fileToUpload);
+    bool result = await _firebaseDbService.updatePhotoUrl(userID, url);
+    return result;
   }
 }

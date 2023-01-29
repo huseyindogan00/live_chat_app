@@ -43,7 +43,7 @@ class FirestoreDbService implements DBBase {
   }
 
   Future<bool> updatePhotoUrl(String userID, String url) async {
-    await _firestore.collection('users/$userID').doc().update({'photoUrl': url});
+    await _firestore.collection('users').doc(userID).update({'photoUrl': url});
     return true;
   }
 }

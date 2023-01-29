@@ -171,7 +171,7 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  Future<String> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) {
+  Future<bool> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) {
     return _userRepository.uploadFile(userID, fileType, fileToUpload);
   }
 }
