@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/interface/database_base.dart';
 
@@ -42,8 +43,20 @@ class FirestoreDbService implements DBBase {
     }
   }
 
+  @override
   Future<bool> updatePhotoUrl(String userID, String url) async {
     await _firestore.collection('users').doc(userID).update({'photoUrl': url});
     return true;
+  }
+
+  @override
+  Future<List<UserModel>> getAllUsers() async {
+    List<UserModel> userList = [];
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('users').get();
+
+    for (QueryDocumentSnapshot<Map<String, dynamic>> userMap in querySnapshot.docs) {
+      userList.add(UserModel.fromMap(userMap.data()));
+    }
+    return userList;
   }
 }

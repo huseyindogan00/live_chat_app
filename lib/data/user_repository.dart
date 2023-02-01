@@ -95,4 +95,8 @@ class UserRepository implements AuthBase {
     bool result = await _firebaseDbService.updatePhotoUrl(userID, url);
     return result;
   }
+
+  Future<List<UserModel>> getAllUsers() async {
+    return await _firebaseDbService.getAllUsers();
+  }
 }

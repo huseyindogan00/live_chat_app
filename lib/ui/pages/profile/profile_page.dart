@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:live_chat_app/core/product/constant/dialog_action_text.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
+import 'package:live_chat_app/ui/components/common/loading_widget.dart';
 import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:live_chat_app/ui/widgets/button/login_button.dart';
@@ -29,7 +30,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    textFormKey.currentState!.dispose();
     controllerUsername.dispose();
     super.dispose();
   }
@@ -79,22 +79,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _buildSaveChangeButton(UserViewModel userViewModel, BuildContext context) async {
     bool? isUrlSave;
-    bool isUserNameSave;
+    bool? isUserNameSave;
 
     if (textFormKey.currentState!.validate()) {
       isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
+      print('isUserNameSave değer -> $isUserNameSave');
+      print('profilePhoto Değeri ${_profilePhoto!.path}');
       if (_profilePhoto != null) {
         isUrlSave = await userViewModel.uploadFile(
             userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
+        print('ifin içinde isUrlSave değer -> $isUrlSave');
       }
-
-      // ignore: use_build_context_synchronously
-      PlatformSensitiveAlertDialog(
-        content: (isUrlSave! || isUserNameSave) ? 'Kullanıcı güncelleme işlemleri başarılı.' : 'Başarısız',
-        title: 'Bilgi',
-        doneButtonTitle: DialogActionText.done,
-      ).show(context);
     }
+    print('ifin dışında isUrlSave değer -> $isUrlSave');
+    // ignore: use_build_context_synchronously
+    PlatformSensitiveAlertDialog(
+      content: (isUrlSave ?? false || isUserNameSave!)
+          ? 'Kullanıcı güncelleme işlemleri başarılı.'
+          : 'Güncelleme başarısız.',
+      title: 'Bilgi',
+      doneButtonTitle: DialogActionText.done,
+    ).show(context);
   }
 
   TextFormField _buildTextFormUserName(UserViewModel userViewModel) {
@@ -192,7 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   _buildGetGallery() async {
-    var newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       _profilePhoto = newProfilePhoto;
       print(_profilePhoto!.path);

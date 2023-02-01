@@ -40,7 +40,7 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   /// Verilen username güncelleme işlemlerinin
-  Future<bool> updateUserName(String userID, String newUserName) async {
+  Future<bool>? updateUserName(String userID, String newUserName) async {
     bool result = await _userRepository.updateUserName(userID, newUserName);
     if (result) {
       _userModel!.userName = newUserName;
@@ -173,5 +173,11 @@ class UserViewModel with ChangeNotifier implements AuthBase {
 
   Future<bool> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) {
     return _userRepository.uploadFile(userID, fileType, fileToUpload);
+  }
+
+  Future<List<UserModel>> getAllUsers() async {
+    List<UserModel> users = await _userRepository.getAllUsers();
+    print('Kullanıcı sayısı : ${users.length}');
+    return users;
   }
 }

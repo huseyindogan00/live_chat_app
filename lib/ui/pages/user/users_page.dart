@@ -1,69 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
+import 'package:provider/provider.dart';
 
 class UsersPage extends StatelessWidget {
   const UsersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    UserViewModel _userViewModel = Provider.of<UserViewModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kullanıcılar'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    builder: (context) => const ExamplePage1(),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.title))
-        ],
       ),
-      body: const Center(
-        child: Text('Kullanıcılar sayfası'),
+      body: Center(
+        child: FutureBuilder(
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else {
+              return Text(snapshot.data!.length.toString());
+            }
+          },
+          future: _userViewModel.getAllUsers(),
+        ),
       ),
-    );
-  }
-}
-
-class ExamplePage1 extends StatelessWidget {
-  const ExamplePage1({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Örnek Sayfa 1'),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  CupertinoPageRoute(
-                    fullscreenDialog: true,
-                    builder: (context) => const ExamplePage2(),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.title))
-        ],
-      ),
-      body: const Text('Örnek Page 1'),
-    );
-  }
-}
-
-class ExamplePage2 extends StatelessWidget {
-  const ExamplePage2({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Örnek Sayfa 2'),
-      ),
-      body: const Text('Örnek Page 2'),
     );
   }
 }

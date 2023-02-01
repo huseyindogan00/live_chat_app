@@ -18,7 +18,7 @@ class FirebaseStorageService implements StorageBase {
 
     UploadTask uploadTask = _storageReference!.putFile(fileToUpload);
 
-    String url = await _storageReference!.getDownloadURL() ?? uploadTask.snapshot.ref.getDownloadURL().toString();
+    String url = await _storageReference!.getDownloadURL();
 
     return url;
   }
