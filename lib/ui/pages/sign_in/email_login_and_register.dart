@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:live_chat_app/core/product/constant/dialog_action_text.dart';
+import 'package:live_chat_app/core/constant/dialog_action_text.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';

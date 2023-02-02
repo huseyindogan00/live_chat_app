@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/ui/pages/sign_in/email_login_and_register.dart';
-import 'package:live_chat_app/core/product/constant/app_icons.dart';
+import 'package:live_chat_app/core/constant/app_icons.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:live_chat_app/ui/widgets/button/login_button.dart';
 import 'package:provider/provider.dart';

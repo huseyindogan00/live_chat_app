@@ -20,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TabItemEnum _currentTab = TabItemEnum.USERS;
 
   Map<TabItemEnum, Widget> get pageAll => {
-        TabItemEnum.USERS: const UsersPage(),
+        TabItemEnum.USERS: UsersPage(),
         TabItemEnum.PROFILE: const ProfilePage(),
       };
 
@@ -36,8 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     //final _userViewModel = Provider.of<UserViewModel>(context);
     return WillPopScope(
-      onWillPop: () async =>
-          await navigatorKeys[_currentTab]!.currentState!.maybePop(),
+      onWillPop: () async => await navigatorKeys[_currentTab]!.currentState!.maybePop(),
       child: MyCustomBottomNavigator(
         navigatorKeys: navigatorKeys,
         currentTab: _currentTab,
@@ -45,9 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onSelectedTab: (selectedTab) {
           if (selectedTab == _currentTab) {
             if (navigatorKeys[selectedTab]!.currentState != null) {
-              navigatorKeys[selectedTab]!
-                  .currentState!
-                  .popUntil((route) => route.isFirst);
+              navigatorKeys[selectedTab]!.currentState!.popUntil((route) => route.isFirst);
             }
           } else {
             setState(() {

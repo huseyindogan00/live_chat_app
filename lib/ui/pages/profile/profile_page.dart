@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:live_chat_app/core/product/constant/dialog_action_text.dart';
+import 'package:live_chat_app/core/constant/dialog_action_text.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/ui/components/common/loading_widget.dart';
 import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
@@ -58,11 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 20),
               _buildTextFormUserName(userViewModel),
               const SizedBox(height: 20),
-              LoginButton(
-                buttonTextWidget: const Text('Değişikleri Kaydet'),
-                buttonColor: Colors.purple,
-                onPressed: () async => await _buildSaveChangeButton(userViewModel, context),
-              )
+              _buildLoginButton(userViewModel, context)
             ],
           ),
         ),
@@ -74,54 +70,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return IconButton(
       onPressed: () => doExit(context),
       icon: const Icon(Icons.logout),
-    );
-  }
-
-  Future<void> _buildSaveChangeButton(UserViewModel userViewModel, BuildContext context) async {
-    bool? isUrlSave;
-    bool? isUserNameSave;
-
-    if (textFormKey.currentState!.validate()) {
-      isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
-      print('isUserNameSave değer -> $isUserNameSave');
-      print('profilePhoto Değeri ${_profilePhoto!.path}');
-      if (_profilePhoto != null) {
-        isUrlSave = await userViewModel.uploadFile(
-            userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
-        print('ifin içinde isUrlSave değer -> $isUrlSave');
-      }
-    }
-    print('ifin dışında isUrlSave değer -> $isUrlSave');
-    // ignore: use_build_context_synchronously
-    PlatformSensitiveAlertDialog(
-      content: (isUrlSave ?? false || isUserNameSave!)
-          ? 'Kullanıcı güncelleme işlemleri başarılı.'
-          : 'Güncelleme başarısız.',
-      title: 'Bilgi',
-      doneButtonTitle: DialogActionText.done,
-    ).show(context);
-  }
-
-  TextFormField _buildTextFormUserName(UserViewModel userViewModel) {
-    return TextFormField(
-      key: textFormKey,
-      controller: controllerUsername,
-      validator: (_) {
-        if (controllerUsername.text.isEmpty) {
-          return 'Username boş olamaz';
-        }
-        return null;
-      },
-      readOnly: false,
-      decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
-    );
-  }
-
-  TextFormField _buildTextFormEmail(UserViewModel userViewModel) {
-    return TextFormField(
-      initialValue: userViewModel.userModel!.email,
-      readOnly: true,
-      decoration: const InputDecoration(labelText: 'Email adresiniz', border: OutlineInputBorder()),
     );
   }
 
@@ -181,21 +129,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> doExit(BuildContext context) async {
-    final _userModel = Provider.of<UserViewModel>(context, listen: false);
-
-    bool? result = await const PlatformSensitiveAlertDialog(
-      content: 'Oturumu kapatmak istedğinizden emin misiniz?',
-      title: 'UYARI!',
-      doneButtonTitle: DialogActionText.yes,
-      cancelButtonTitle: DialogActionText.cancel,
-    ).show(context);
-
-    if (result != null && result) {
-      await _userModel.signOut();
-    }
-  }
-
   _buildGetGallery() async {
     XFile? newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
@@ -211,5 +144,76 @@ class _ProfilePageState extends State<ProfilePage> {
       _profilePhoto = newProfilePhoto;
       print(_profilePhoto!.path);
     });
+  }
+
+  TextFormField _buildTextFormEmail(UserViewModel userViewModel) {
+    return TextFormField(
+      initialValue: userViewModel.userModel!.email,
+      readOnly: true,
+      decoration: const InputDecoration(labelText: 'Email adresiniz', border: OutlineInputBorder()),
+    );
+  }
+
+  TextFormField _buildTextFormUserName(UserViewModel userViewModel) {
+    return TextFormField(
+      key: textFormKey,
+      controller: controllerUsername,
+      validator: (_) {
+        if (controllerUsername.text.isEmpty) {
+          return 'Username boş olamaz';
+        }
+        return null;
+      },
+      readOnly: false,
+      decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
+    );
+  }
+
+  LoginButton _buildLoginButton(UserViewModel userViewModel, BuildContext context) {
+    return LoginButton(
+      buttonTextWidget: const Text('Değişikleri Kaydet'),
+      buttonColor: Colors.purple,
+      onPressed: () async => await _buildSaveChangeButton(userViewModel, context),
+    );
+  }
+
+  Future<void> _buildSaveChangeButton(UserViewModel userViewModel, BuildContext context) async {
+    bool? isUrlSave;
+    bool? isUserNameSave;
+
+    if (textFormKey.currentState!.validate()) {
+      isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
+      print('isUserNameSave değer -> $isUserNameSave');
+      print('profilePhoto Değeri ${_profilePhoto!.path}');
+      if (_profilePhoto != null) {
+        isUrlSave = await userViewModel.uploadFile(
+            userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
+        print('ifin içinde isUrlSave değer -> $isUrlSave');
+      }
+    }
+    print('ifin dışında isUrlSave değer -> $isUrlSave');
+    // ignore: use_build_context_synchronously
+    PlatformSensitiveAlertDialog(
+      content: (isUrlSave ?? false || isUserNameSave!)
+          ? 'Kullanıcı güncelleme işlemleri başarılı.'
+          : 'Güncelleme başarısız.',
+      title: 'Bilgi',
+      doneButtonTitle: DialogActionText.done,
+    ).show(context);
+  }
+
+  Future<void> doExit(BuildContext context) async {
+    final _userModel = Provider.of<UserViewModel>(context, listen: false);
+
+    bool? result = await const PlatformSensitiveAlertDialog(
+      content: 'Oturumu kapatmak istedğinizden emin misiniz?',
+      title: 'UYARI!',
+      doneButtonTitle: DialogActionText.yes,
+      cancelButtonTitle: DialogActionText.cancel,
+    ).show(context);
+
+    if (result != null && result) {
+      await _userModel.signOut();
+    }
   }
 }
