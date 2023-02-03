@@ -16,6 +16,7 @@ class UsersPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kullanıcılar'),
+        centerTitle: true,
       ),
       body: Center(
         child: FutureBuilder(
@@ -37,7 +38,8 @@ class UsersPage extends StatelessWidget {
     );
   }
 
-  ListView _buildListBuilder(BuildContext context, List<UserModel>? users, UserViewModel _userViewModel) {
+  ListView _buildListBuilder(BuildContext context, List<UserModel>? users,
+      UserViewModel _userViewModel) {
     return ListView.builder(
       itemCount: users!.length,
       itemBuilder: (context, index) {
@@ -53,11 +55,15 @@ class UsersPage extends StatelessWidget {
   Card _buildUserCard(BuildContext context, List<UserModel> users, int index) {
     return Card(
       child: InkWell(
-        onTap: () => Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-          builder: (context) => TalkPage(chatUser: users[index], currentUser: _userViewModel.userModel!),
+        onTap: () =>
+            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+          builder: (context) => TalkPage(
+              chatUser: users[index], currentUser: _userViewModel.userModel!),
         )),
         child: ListTile(
-          leading: users[index].photoUrl != null ? _buildProfilePhoto(users, index) : _buildDefaultProfilePhoto(),
+          leading: users[index].photoUrl != null
+              ? _buildProfilePhoto(users, index)
+              : _buildDefaultProfilePhoto(),
           title: Text(users[index].userName.toString()),
           subtitle: Text(users[index].email.toString()),
         ),
