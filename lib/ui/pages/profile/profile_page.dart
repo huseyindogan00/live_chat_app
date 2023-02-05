@@ -1,4 +1,6 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:live_chat_app/core/constant/dialog_action_text.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
@@ -38,6 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     UserViewModel userViewModel = Provider.of<UserViewModel>(context);
     controllerUsername.text = userViewModel.userModel!.userName!;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profil'),
@@ -58,7 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
               const SizedBox(height: 20),
               _buildTextFormUserName(userViewModel),
               const SizedBox(height: 20),
-              _buildLoginButton(userViewModel, context)
+              _buildChangeRegisterButton(userViewModel, context)
             ],
           ),
         ),
@@ -133,7 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
     XFile? newProfilePhoto = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       _profilePhoto = newProfilePhoto;
-      print(_profilePhoto!.path);
     });
   }
 
@@ -142,7 +144,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     setState(() {
       _profilePhoto = newProfilePhoto;
-      print(_profilePhoto!.path);
     });
   }
 
@@ -169,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  LoginButton _buildLoginButton(UserViewModel userViewModel, BuildContext context) {
+  LoginButton _buildChangeRegisterButton(UserViewModel userViewModel, BuildContext context) {
     return LoginButton(
       buttonTextWidget: const Text('Değişikleri Kaydet'),
       buttonColor: Colors.purple,
@@ -181,25 +182,33 @@ class _ProfilePageState extends State<ProfilePage> {
     bool? isUrlSave;
     bool? isUserNameSave;
 
-    if (textFormKey.currentState!.validate()) {
-      isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
-      print('isUserNameSave değer -> $isUserNameSave');
-      print('profilePhoto Değeri ${_profilePhoto!.path}');
-      if (_profilePhoto != null) {
-        isUrlSave = await userViewModel.uploadFile(
-            userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
-        print('ifin içinde isUrlSave değer -> $isUrlSave');
+    try {
+      if (textFormKey.currentState!.validate()) {
+        isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
+        print('isUserNameSave değer -> $isUserNameSave');
+        print('profilePhoto Değeri ${_profilePhoto!.path}');
+        if (_profilePhoto != null) {
+          isUrlSave = await userViewModel.uploadFile(
+              userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
+          print('ifin içinde isUrlSave değer -> $isUrlSave');
+        }
       }
+      print('ifin dışında isUrlSave değer -> $isUrlSave');
+      // ignore: use_build_context_synchronously
+      PlatformSensitiveAlertDialog(
+        content: (isUrlSave ?? false || isUserNameSave!)
+            ? 'Kullanıcı güncelleme işlemleri başarılı.'
+            : 'Güncelleme başarısız.',
+        title: 'Bilgi',
+        doneButtonTitle: DialogActionText.done,
+      ).show(context);
+    } on FirebaseException catch (e) {
+      PlatformSensitiveAlertDialog(
+        content: 'Kaydetme işlemi başarısız oldu.\n\n-> ${e.message}',
+        title: 'Hata',
+        doneButtonTitle: DialogActionText.done,
+      ).show(context);
     }
-    print('ifin dışında isUrlSave değer -> $isUrlSave');
-    // ignore: use_build_context_synchronously
-    PlatformSensitiveAlertDialog(
-      content: (isUrlSave ?? false || isUserNameSave!)
-          ? 'Kullanıcı güncelleme işlemleri başarılı.'
-          : 'Güncelleme başarısız.',
-      title: 'Bilgi',
-      doneButtonTitle: DialogActionText.done,
-    ).show(context);
   }
 
   Future<void> doExit(BuildContext context) async {

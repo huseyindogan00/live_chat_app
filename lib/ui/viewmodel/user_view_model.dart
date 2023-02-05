@@ -1,11 +1,10 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'dart:io';
-
-import 'package:cross_file/src/types/interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
+import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/data/user_repository.dart';
@@ -15,7 +14,7 @@ enum ViewState { Idle, Busy }
 
 class UserViewModel with ChangeNotifier implements AuthBase {
   UserViewModel() {
-    currentUser();
+    //currentUser();
   }
 
   static AppMode appMode = AppMode.DEBUG;
@@ -25,6 +24,10 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   UserModel? _userModel;
 
   UserModel? get userModel => _userModel;
+  set userModel(UserModel? value) {
+    _userModel = value;
+  }
+
   String emailErrorMessage = '';
   String passwordErrorMessage = '';
 
@@ -121,11 +124,10 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) async {
+  Future<UserModel?> createUserWithEmailAndPassword(String email, String password) async {
     try {
       state = ViewState.Busy;
-
-      _userModel = await _userRepository.crateUserWithEmailAndPassword(email, password);
+      _userModel = await _userRepository.createUserWithEmailAndPassword(email, password);
     } on FirebaseAuthException catch (e) {
       debugPrint('ViewModeldeki create user hatası ${e.message}');
     } finally {
@@ -179,5 +181,13 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     List<UserModel> users = await _userRepository.getAllUsers();
     print('Kullanıcı sayısı : ${users.length}');
     return users;
+  }
+
+  Stream<List<MessageModel>> getMessage(String currentUserID, String chatUserID) {
+    return _userRepository.getMessages(currentUserID, chatUserID);
+  }
+
+  Future<bool> saveMessage(MessageModel messageModel) async {
+    return _userRepository.saveMessage(messageModel);
   }
 }

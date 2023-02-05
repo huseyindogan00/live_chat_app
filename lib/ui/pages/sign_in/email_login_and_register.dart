@@ -121,20 +121,22 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
         entryUser = await _userViewModel.signInWithEmailAndPassword(_email!, _password!);
         if (entryUser == null) {
           // ignore: use_build_context_synchronously
-          const PlatformSensitiveAlertDialog(
+          await const PlatformSensitiveAlertDialog(
             content: 'Kullanıcı bulunamadı ya da şifre yanlış.',
             title: 'Uyarı!',
             doneButtonTitle: DialogActionText.done,
           ).show(context);
         }
       } else {
-        createUser = await _userViewModel.crateUserWithEmailAndPassword(_email!, _password!);
+        createUser = await _userViewModel.createUserWithEmailAndPassword(_email!, _password!);
+        _userViewModel.userModel = createUser;
         if (_formType == FormType.REGISTER && createUser == null) {
-          const PlatformSensitiveAlertDialog(
+          // ignore: use_build_context_synchronously
+          await const PlatformSensitiveAlertDialog(
             content: 'Kullanıcı zaten kayıtlı, lütfen giriş yapınız.',
             title: 'Uyarı!',
             doneButtonTitle: DialogActionText.done,
-          );
+          ).show(context);
         }
       }
     }

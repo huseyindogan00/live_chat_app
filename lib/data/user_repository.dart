@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
+import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/data/services/firestore_db_service.dart';
 import 'package:live_chat_app/data/services/interface/auth_base.dart';
-import 'package:live_chat_app/data/services/fake_auth_service.dart';
 import 'package:live_chat_app/data/services/firebase_auth_service.dart';
 
 // ignore: constant_identifier_names
@@ -59,14 +59,14 @@ class UserRepository implements AuthBase {
   ///
   ///Kaydedilen kullanıcı bilgilerini Firestore'dan okuyarak geriye UserModel döner.
   @override
-  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) async {
-    UserModel? _userModel = await _firebaseAuthService.crateUserWithEmailAndPassword(email, password);
+  Future<UserModel?> createUserWithEmailAndPassword(String email, String password) async {
+    UserModel? _userModel = await _firebaseAuthService.createUserWithEmailAndPassword(email, password);
 
     if (_userModel != null) {
       bool result = await _firebaseDbService.saveUser(_userModel);
 
       if (result) {
-        await _firebaseDbService.readUser(_userModel.userID!);
+        _userModel = await _firebaseDbService.readUser(_userModel.userID!);
         return _userModel;
       }
     }
@@ -98,5 +98,13 @@ class UserRepository implements AuthBase {
 
   Future<List<UserModel>> getAllUsers() async {
     return await _firebaseDbService.getAllUsers();
+  }
+
+  Stream<List<MessageModel>> getMessages(String currentUserID, String chatUserID) {
+    return _firebaseDbService.getMessage(currentUserID, chatUserID);
+  }
+
+  Future<bool> saveMessage(MessageModel messageModel) async {
+    return await _firebaseDbService.saveMessage(messageModel);
   }
 }

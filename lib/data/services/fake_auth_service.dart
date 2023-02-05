@@ -35,7 +35,7 @@ class FakeAuthService implements AuthBase {
   }
 
   @override
-  Future<UserModel?> crateUserWithEmailAndPassword(String email, String password) {
+  Future<UserModel?> createUserWithEmailAndPassword(String email, String password) {
     // TODO: implement crateUserWithEmailAndPassword
     throw UnimplementedError();
   }

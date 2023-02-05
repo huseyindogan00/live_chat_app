@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/interface/database_base.dart';
 
@@ -58,5 +58,47 @@ class FirestoreDbService implements DBBase {
       userList.add(UserModel.fromMap(userMap.data()));
     }
     return userList;
+  }
+
+  /// Verilen chatUserID ile olan mesajları tarih sırasına göre bir listede döner.
+  @override
+  Stream<List<MessageModel>> getMessage(String currentUserID, String chatUserID) {
+    Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = _firestore
+        .collection('users')
+        .doc(currentUserID)
+        .collection('messages')
+        .doc('$currentUserID--$chatUserID')
+        .collection('message')
+        .orderBy('date')
+        .snapshots();
+
+    Stream<List<MessageModel>> messageList =
+        snapshot.map((mapStreamMessage) => mapStreamMessage.docs.map((e) => MessageModel.fromMap(e.data())).toList());
+
+    return messageList;
+  }
+
+  /// Verilen messageModel objesini currentUser ve chatUsera kaydeder.
+  @override
+  Future<bool> saveMessage(MessageModel messageModel) async {
+    await _firestore
+        .collection('users')
+        .doc(messageModel.fromWhoID)
+        .collection('messages')
+        .doc('${messageModel.fromWhoID}--${messageModel.whoID}')
+        .collection('message')
+        .add(messageModel.toMap());
+
+    messageModel.fromMe = false;
+
+    await _firestore
+        .collection('users')
+        .doc(messageModel.whoID)
+        .collection('messages')
+        .doc('${messageModel.whoID}--${messageModel.fromWhoID}')
+        .collection('message')
+        .add(messageModel.toMap());
+
+    return true;
   }
 }
