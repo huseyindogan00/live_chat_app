@@ -11,7 +11,10 @@ class FirestoreDbService implements DBBase {
   Future<bool> saveUser(UserModel userModel) async {
     userModel.createAt = FieldValue.serverTimestamp();
 
-    await _firestore.collection('users').doc(userModel.userID).set(userModel.toMap());
+    await _firestore
+        .collection('users')
+        .doc(userModel.userID)
+        .set(userModel.toMap());
 /* 
     DocumentSnapshot snapshot = await _firestore.doc('users/${userModel.userID}').get();
     Map<String, dynamic> _readUser = snapshot.data() as Map<String, dynamic>;
@@ -23,9 +26,11 @@ class FirestoreDbService implements DBBase {
   /// Verilen userID'ye ait User'ı Firebase'den getirerek UserModel nesnesine dönüştürür ve geriye UserModel döner.
   @override
   Future<UserModel> readUser(String userID) async {
-    DocumentSnapshot _readUserSapshot = await _firestore.collection('users').doc(userID).get();
+    DocumentSnapshot _readUserSapshot =
+        await _firestore.collection('users').doc(userID).get();
 
-    Map<String, dynamic> _readUserMap = _readUserSapshot.data() as Map<String, dynamic>;
+    Map<String, dynamic> _readUserMap =
+        _readUserSapshot.data() as Map<String, dynamic>;
 
     UserModel userModel = UserModel.fromMap(_readUserMap);
 
@@ -34,9 +39,15 @@ class FirestoreDbService implements DBBase {
 
   @override
   Future<bool> updateUserName(String userID, String newUserName) async {
-    QuerySnapshot result = await _firestore.collection('users').where('userName', isEqualTo: newUserName).get();
+    QuerySnapshot result = await _firestore
+        .collection('users')
+        .where('userName', isEqualTo: newUserName)
+        .get();
     if (result.docs.isEmpty) {
-      await _firestore.collection('users').doc(userID).update({'userName': newUserName});
+      await _firestore
+          .collection('users')
+          .doc(userID)
+          .update({'userName': newUserName});
       return true;
     } else {
       return false;
@@ -52,9 +63,11 @@ class FirestoreDbService implements DBBase {
   @override
   Future<List<UserModel>> getAllUsers() async {
     List<UserModel> userList = [];
-    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('users').get();
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _firestore.collection('users').get();
 
-    for (QueryDocumentSnapshot<Map<String, dynamic>> userMap in querySnapshot.docs) {
+    for (QueryDocumentSnapshot<Map<String, dynamic>> userMap
+        in querySnapshot.docs) {
       userList.add(UserModel.fromMap(userMap.data()));
     }
     return userList;
@@ -62,7 +75,8 @@ class FirestoreDbService implements DBBase {
 
   /// Verilen chatUserID ile olan mesajları tarih sırasına göre bir listede döner.
   @override
-  Stream<List<MessageModel>> getMessage(String currentUserID, String chatUserID) {
+  Stream<List<MessageModel>> getMessage(
+      String currentUserID, String chatUserID) {
     Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = _firestore
         .collection('users')
         .doc(currentUserID)
@@ -72,13 +86,15 @@ class FirestoreDbService implements DBBase {
         .orderBy('date')
         .snapshots();
 
-    Stream<List<MessageModel>> messageList =
-        snapshot.map((mapStreamMessage) => mapStreamMessage.docs.map((e) => MessageModel.fromMap(e.data())).toList());
+    Stream<List<MessageModel>> messageList = snapshot.map((mapStreamMessage) =>
+        mapStreamMessage.docs
+            .map((e) => MessageModel.fromMap(e.data()))
+            .toList());
 
     return messageList;
   }
 
-  /// Verilen messageModel objesini currentUser ve chatUsera kaydeder.
+  /// Verilen messageModel nesnesini currentUser ve chatUser'a kaydeder.
   @override
   Future<bool> saveMessage(MessageModel messageModel) async {
     await _firestore
