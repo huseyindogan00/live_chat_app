@@ -11,21 +11,11 @@ String getDateTimeMessageFormat(Timestamp? timestamp) {
     return '';
   }
 
-  munite = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch)
-      .minute
-      .toString();
-  hour = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch)
-      .hour
-      .toString();
-  day = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch)
-      .day
-      .toString();
-  month = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch)
-      .month
-      .toString();
-  year = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch)
-      .year
-      .toString();
+  munite = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch).minute.toString();
+  hour = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch).hour.toString();
+  day = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch).day.toString();
+  month = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch).month.toString();
+  year = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch).year.toString();
 
   return '$hour:$munite $day/$month/$year';
 }
