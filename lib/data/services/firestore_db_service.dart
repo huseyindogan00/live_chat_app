@@ -74,8 +74,8 @@ class FirestoreDbService implements DBBase {
         .orderBy('date', descending: true)
         .snapshots();
 
-    Stream<List<MessageModel>> messageList =
-        snapshot.map((mapStreamMessage) => mapStreamMessage.docs.map((e) => MessageModel.fromMap(e.data())).toList());
+    Stream<List<MessageModel>> messageList = snapshot.map(
+        (mapStreamMessage) => mapStreamMessage.docs.map((dataMap) => MessageModel.fromMap(dataMap.data())).toList());
 
     return messageList;
   }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:live_chat_app/core/constant/image/image_const_path.dart';
 import 'package:live_chat_app/core/utility/global_util.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
@@ -18,6 +19,9 @@ class TalkPage extends StatefulWidget {
 }
 
 class _TalkPageState extends State<TalkPage> {
+  TextStyle timeTextStyle = TextStyle(color: Colors.grey.shade500);
+  SizedBox rowTimeAndMessageSizedBox = const SizedBox(width: 10);
+
   late final UserModel currentUser;
   late final UserModel chatUser;
   TextEditingController messageTextFieldController = TextEditingController();
@@ -83,7 +87,7 @@ class _TalkPageState extends State<TalkPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const SizedBox(width: 5),
+            rowTimeAndMessageSizedBox,
             Container(
               decoration: BoxDecoration(
                 color: Colors.blueAccent.shade200,
@@ -98,7 +102,11 @@ class _TalkPageState extends State<TalkPage> {
               margin: const EdgeInsets.only(bottom: 20),
               child: Text(message.message),
             ),
-            Text(getDateTimeMessageFormat(message.date).split(' ').first)
+            rowTimeAndMessageSizedBox,
+            Text(
+              getDateTimeMessageFormat(message.date).split(' ').first,
+              style: timeTextStyle,
+            )
           ],
         ),
       ],
@@ -116,7 +124,7 @@ class _TalkPageState extends State<TalkPage> {
                     maxRadius: 20,
                   )
                 : const SizedBox(width: 40),
-            const SizedBox(width: 5),
+            rowTimeAndMessageSizedBox,
             Flexible(
               child: Container(
                 decoration: const BoxDecoration(
@@ -133,8 +141,11 @@ class _TalkPageState extends State<TalkPage> {
                 child: Text(message.message),
               ),
             ),
-            const SizedBox(width: 10),
-            Text(getDateTimeMessageFormat(message.date).split(' ').first)
+            rowTimeAndMessageSizedBox,
+            Text(
+              getDateTimeMessageFormat(message.date).split(' ').first,
+              style: timeTextStyle,
+            )
           ],
         ),
       ],

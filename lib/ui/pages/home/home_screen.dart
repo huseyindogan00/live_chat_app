@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/pages/profile/profile_page.dart';
+import 'package:live_chat_app/ui/pages/talk/my_talks_page.dart';
 import 'package:live_chat_app/ui/pages/user/users_page.dart';
 import 'package:live_chat_app/ui/widgets/bottom_navi/my_custom_bottom_navi.dart';
 import 'package:live_chat_app/ui/widgets/bottom_navi/tab_item.dart';
@@ -21,15 +22,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Map<TabItemEnum, Widget> get pageAll => {
         TabItemEnum.USERS: UsersPage(),
+        TabItemEnum.TALKS: const MyTalksPage(),
         TabItemEnum.PROFILE: const ProfilePage(),
       };
 
   final GlobalKey<NavigatorState> usersNavState = GlobalKey<NavigatorState>();
   final GlobalKey<NavigatorState> profileNavState = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> talksNavState = GlobalKey<NavigatorState>();
 
   Map<TabItemEnum, GlobalKey<NavigatorState>> get navigatorKeys => {
         TabItemEnum.USERS: usersNavState,
         TabItemEnum.PROFILE: profileNavState,
+        TabItemEnum.TALKS: talksNavState,
       };
 
   @override
@@ -56,30 +60,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-/* Center(
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Text(
-                'Hoşgeldiniz\n${userModel!.name ?? ''}',
-                style: Theme.of(context).textTheme.headline4,
-              ),
-              CircleAvatar(
-                  foregroundImage: userModel!.photoUrl != null ? NetworkImage(userModel!.photoUrl!) : null,
-                  maxRadius: 50),
-              const Spacer(flex: 1),
-              Text(
-                'Mail : ${userModel!.email ?? ''}',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              const Spacer(flex: 1),
-              Text('Numara: ${userModel!.phoneNumber ?? 'boş'}'),
-              const Spacer(flex: 5)
-            ],
-          ),
-        ),
-      ), */
