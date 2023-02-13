@@ -7,7 +7,7 @@ import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/ui/components/common/loading_widget.dart';
 import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
-import 'package:live_chat_app/ui/widgets/button/login_button.dart';
+import 'package:live_chat_app/ui/components/common/button/login_button.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 
@@ -185,15 +185,11 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       if (textFormKey.currentState!.validate()) {
         isUserNameSave = await userViewModel.updateUserName(userViewModel.userModel!.userID!, controllerUsername.text);
-        print('isUserNameSave değer -> $isUserNameSave');
-        print('profilePhoto Değeri ${_profilePhoto!.path}');
         if (_profilePhoto != null) {
           isUrlSave = await userViewModel.uploadFile(
               userViewModel.userModel!.userID, StrorageFileEnum.ProfilePhoto, File(_profilePhoto!.path));
-          print('ifin içinde isUrlSave değer -> $isUrlSave');
         }
       }
-      print('ifin dışında isUrlSave değer -> $isUrlSave');
       // ignore: use_build_context_synchronously
       PlatformSensitiveAlertDialog(
         content: (isUrlSave ?? false || isUserNameSave!)

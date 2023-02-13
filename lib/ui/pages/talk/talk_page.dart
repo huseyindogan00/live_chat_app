@@ -26,13 +26,20 @@ class _TalkPageState extends State<TalkPage> {
   late final UserModel chatUser;
   TextEditingController messageTextFieldController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  int isCurrentMessageMoreThenOne = 0;
+  //int isCurrentMessageMoreThenOne = 0;
 
   @override
   void initState() {
     super.initState();
     currentUser = widget.currentUser;
     chatUser = widget.chatUser;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    messageTextFieldController.dispose();
+    super.dispose();
   }
 
   @override
@@ -63,10 +70,8 @@ class _TalkPageState extends State<TalkPage> {
                         MessageModel message = messages[index];
 
                         if (message.fromMe) {
-                          isCurrentMessageMoreThenOne = 0;
                           return _buildCurrentUserMessageText(message);
                         }
-                        isCurrentMessageMoreThenOne++;
                         return _buildChatUserMessageText(message, _userViewModel);
                       },
                     );
@@ -118,12 +123,10 @@ class _TalkPageState extends State<TalkPage> {
       children: [
         Row(
           children: [
-            isCurrentMessageMoreThenOne == 1
-                ? CircleAvatar(
-                    backgroundImage: _buildChatUserProfilPhoto(),
-                    maxRadius: 20,
-                  )
-                : const SizedBox(width: 40),
+            CircleAvatar(
+              backgroundImage: _buildChatUserProfilPhoto(),
+              maxRadius: 20,
+            ),
             rowTimeAndMessageSizedBox,
             Flexible(
               child: Container(

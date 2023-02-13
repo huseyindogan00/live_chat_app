@@ -179,7 +179,11 @@ class UserViewModel with ChangeNotifier implements AuthBase {
 
   Future<List<UserModel>> getAllUsers() async {
     List<UserModel> users = await _userRepository.getAllUsers();
-    print('Kullanıcı sayısı : ${users.length}');
+    return users;
+  }
+
+  Future<List<UserModel>> getChattedUsers(String userID) async {
+    List<UserModel> users = await _userRepository.getChattedUsers(userID);
     return users;
   }
 

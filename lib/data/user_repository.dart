@@ -100,6 +100,10 @@ class UserRepository implements AuthBase {
     return await _firebaseDbService.getAllUsers();
   }
 
+  Future<List<UserModel>> getChattedUsers(String userID) async {
+    return await _firebaseDbService.getChattedUsers(userID);
+  }
+
   Stream<List<MessageModel>> getMessages(String currentUserID, String chatUserID) {
     return _firebaseDbService.getMessage(currentUserID, chatUserID);
   }

@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/ui/components/common/bottom_navi/tab_item.dart';
 import 'package:live_chat_app/ui/pages/profile/profile_page.dart';
 import 'package:live_chat_app/ui/pages/talk/my_talks_page.dart';
-import 'package:live_chat_app/ui/pages/user/users_page.dart';
-import 'package:live_chat_app/ui/widgets/bottom_navi/my_custom_bottom_navi.dart';
-import 'package:live_chat_app/ui/widgets/bottom_navi/tab_item.dart';
+import 'package:live_chat_app/ui/pages/users/users_page.dart';
+import 'package:live_chat_app/ui/components/common/bottom_navi/my_custom_bottom_navi.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key, required this.userModel});

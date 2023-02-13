@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/interface/database_base.dart';
@@ -59,6 +60,27 @@ class FirestoreDbService implements DBBase {
     for (QueryDocumentSnapshot<Map<String, dynamic>> userMap in querySnapshot.docs) {
       userList.add(UserModel.fromMap(userMap.data()));
     }
+    return userList;
+  }
+
+  @override
+  Future<List<UserModel>> getChattedUsers(String userID) async {
+    List<UserModel> userList = [];
+    DocumentReference<Map<String, dynamic>> querySnapshot =
+        await _firestore.collection('users').doc(userID).collection('messages').doc();
+
+    /* 
+          konuşulan kullanıcıları sayfaya getirmek için konuşulan usera ait id yi alıp o idye göre userları sayfaya getirmemiz gerek
+
+         */
+
+    querySnapshot.get().then((value) {
+      debugPrint(value.data()!.entries.toString());
+    });
+
+    /* for (QueryDocumentSnapshot<Map<String, dynamic>> userMap in querySnapshot.data().keys) {
+      userList.add(UserModel.fromMap(userMap.data()));
+    } */
     return userList;
   }
 

@@ -12,7 +12,8 @@ class _MyTalksPageState extends State<MyTalksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Konuşmalar'),
+        centerTitle: true,
+        title: Text('Sohbetler'),
       ),
       body: Container(
         child: Text('koonuşmalar'),

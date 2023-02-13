@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:live_chat_app/ui/widgets/bottom_navi/tab_item.dart';
+import 'package:live_chat_app/ui/components/common/bottom_navi/tab_item.dart';
 
 class MyCustomBottomNavigator extends StatelessWidget {
   const MyCustomBottomNavigator({

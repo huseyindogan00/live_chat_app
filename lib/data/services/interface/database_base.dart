@@ -8,6 +8,7 @@ abstract class DBBase {
   Future<bool> updateUserName(String userID, String userName);
   Future<bool> updatePhotoUrl(String userID, String url);
   Future<List<UserModel>> getAllUsers();
+  Future<List<UserModel>> getChattedUsers(String userID);
   Stream<List<MessageModel>> getMessage(String currentUserID, String chatUserID);
   Future<bool> saveMessage(MessageModel messageModel);
 }
