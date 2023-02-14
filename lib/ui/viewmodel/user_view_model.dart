@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
+import 'package:live_chat_app/data/models/chat_user_model.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
@@ -177,18 +178,19 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     return _userRepository.uploadFile(userID, fileType, fileToUpload);
   }
 
-  Future<List<UserModel>> getAllUsers() async {
-    List<UserModel> users = await _userRepository.getAllUsers();
+  Future<List<UserModel>> fetchAllUsers() async {
+    List<UserModel> users = await _userRepository.fetchAllUsers();
     return users;
   }
 
-  Future<List<UserModel>> getChattedUsers(String userID) async {
-    List<UserModel> users = await _userRepository.getChattedUsers(userID);
-    return users;
+  Future<List<UserModel>> fetchChattedUsers(String userID) async {
+    List<UserModel> usersList = await _userRepository.fetchChattedUsers(userID);
+
+    return usersList;
   }
 
-  Stream<List<MessageModel>> getMessage(String currentUserID, String chatUserID) {
-    return _userRepository.getMessages(currentUserID, chatUserID);
+  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
+    return _userRepository.fetchMessage(currentUserID, chatUserID);
   }
 
   Future<bool> saveMessage(MessageModel messageModel) async {

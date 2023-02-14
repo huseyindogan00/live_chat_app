@@ -56,7 +56,7 @@ class _TalkPageState extends State<TalkPage> {
           children: [
             Expanded(
               child: StreamBuilder<List<MessageModel>>(
-                stream: _userViewModel.getMessage(currentUser.userID!, chatUser.userID!),
+                stream: _userViewModel.fetchMessage(currentUser.userID!, chatUser.userID!),
                 builder: (context, AsyncSnapshot<List<MessageModel>> snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());

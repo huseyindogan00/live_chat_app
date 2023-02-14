@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:live_chat_app/data/models/chat_user_model.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/interface/database_base.dart';
@@ -53,7 +54,7 @@ class FirestoreDbService implements DBBase {
   }
 
   @override
-  Future<List<UserModel>> getAllUsers() async {
+  Future<List<UserModel>> fetchAllUsers() async {
     List<UserModel> userList = [];
     QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore.collection('users').get();
 
@@ -64,29 +65,35 @@ class FirestoreDbService implements DBBase {
   }
 
   @override
-  Future<List<UserModel>> getChattedUsers(String userID) async {
+  Future<List<ChatUserModel>> fetchChattedUsersId(String userID) async {
+    List<ChatUserModel> chatUserList = [];
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _firestore.collection('users').doc(userID).collection('chatUsers').get();
+
+    for (var chatUser in querySnapshot.docs) {
+      chatUserList.add(ChatUserModel.fromMap(chatUser.data()));
+    }
+
+    return chatUserList;
+  }
+
+  @override
+  Future<List<UserModel>> getUsers(List<String> chatUserIDList) async {
     List<UserModel> userList = [];
-    DocumentReference<Map<String, dynamic>> querySnapshot =
-        await _firestore.collection('users').doc(userID).collection('messages').doc();
 
-    /* 
-          konuşulan kullanıcıları sayfaya getirmek için konuşulan usera ait id yi alıp o idye göre userları sayfaya getirmemiz gerek
+    for (var i = 0; i < chatUserIDList.length; i++) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('users').doc(chatUserIDList[i]).get();
 
-         */
+      userList.add(UserModel.fromMap(snapshot.data()!));
+    }
 
-    querySnapshot.get().then((value) {
-      debugPrint(value.data()!.entries.toString());
-    });
-
-    /* for (QueryDocumentSnapshot<Map<String, dynamic>> userMap in querySnapshot.data().keys) {
-      userList.add(UserModel.fromMap(userMap.data()));
-    } */
     return userList;
   }
 
   /// Verilen chatUserID ile olan mesajları tarih sırasına göre bir listede döner.
   @override
-  Stream<List<MessageModel>> getMessage(String currentUserID, String chatUserID) {
+  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
     Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = _firestore
         .collection('users')
         .doc(currentUserID)
@@ -112,6 +119,12 @@ class FirestoreDbService implements DBBase {
         .doc('${messageModel.fromWhoID}--${messageModel.whoID}')
         .collection('message')
         .add(messageModel.toMap());
+
+    await _firestore
+        .collection('users')
+        .doc(messageModel.fromWhoID)
+        .collection('chatUsers')
+        .add({'chatUserId': messageModel.whoID});
 
     messageModel.fromMe = false;
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
+import 'package:live_chat_app/data/models/chat_user_model.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
@@ -96,16 +97,22 @@ class UserRepository implements AuthBase {
     return result;
   }
 
-  Future<List<UserModel>> getAllUsers() async {
-    return await _firebaseDbService.getAllUsers();
+  Future<List<UserModel>> fetchAllUsers() async {
+    return await _firebaseDbService.fetchAllUsers();
   }
 
-  Future<List<UserModel>> getChattedUsers(String userID) async {
-    return await _firebaseDbService.getChattedUsers(userID);
+  Future<List<UserModel>> fetchChattedUsers(String userID) async {
+    List<ChatUserModel> chatsUsers = await _firebaseDbService.fetchChattedUsersId(userID);
+    List<String> chatUserIDList = [];
+    for (ChatUserModel chatUser in chatsUsers) {
+      chatUserIDList.add(chatUser.chatUserId);
+    }
+    List<UserModel> userModelList = await _firebaseDbService.getUsers(chatUserIDList);
+    return userModelList;
   }
 
-  Stream<List<MessageModel>> getMessages(String currentUserID, String chatUserID) {
-    return _firebaseDbService.getMessage(currentUserID, chatUserID);
+  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
+    return _firebaseDbService.fetchMessage(currentUserID, chatUserID);
   }
 
   Future<bool> saveMessage(MessageModel messageModel) async {

@@ -5,7 +5,7 @@ import 'package:live_chat_app/ui/pages/talk/talk_page.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 
 class FutureUsersWidget extends StatefulWidget {
-  FutureUsersWidget({super.key, required this.userViewModel, this.isTalks = true});
+  FutureUsersWidget({super.key, required this.userViewModel, this.isTalks = false});
   final UserViewModel userViewModel;
   bool isTalks;
 
@@ -28,12 +28,13 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
   Widget build(BuildContext context) {
     return Center(
       child: FutureBuilder(
-        future: _userViewModel.getChattedUsers(_userViewModel.userModel!.userID.toString()),
+        future: _isTalks
+            ? _userViewModel.fetchChattedUsers(_userViewModel.userModel!.userID.toString())
+            : _userViewModel.fetchAllUsers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               List<UserModel>? users = snapshot.data;
-              print('Konuşulan user sayısı ==========>> ${users!.length}');
               return _buildListBuilder(context, users, _userViewModel);
             } else {
               return const Center(child: Text('Kayıtlı kullanıcı yoktur.'));

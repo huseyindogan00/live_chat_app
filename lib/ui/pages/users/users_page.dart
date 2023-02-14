@@ -16,7 +16,7 @@ class UsersPage extends StatelessWidget {
         title: const Text('Kullanıcılar'),
         centerTitle: true,
       ),
-      body: FutureUsersWidget(userViewModel: _userViewModel),
+      body: FutureUsersWidget(userViewModel: _userViewModel, isTalks: false),
     );
   }
 }
