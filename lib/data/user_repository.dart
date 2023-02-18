@@ -1,13 +1,15 @@
 import 'dart:io';
 
+import 'package:timeago/timeago.dart' as timeago;
+
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
 import 'package:live_chat_app/data/models/chat_user_model.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/data/services/firebase_auth_service.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
 import 'package:live_chat_app/data/services/firestore_db_service.dart';
 import 'package:live_chat_app/data/services/interface/auth_base.dart';
-import 'package:live_chat_app/data/services/firebase_auth_service.dart';
 
 // ignore: constant_identifier_names
 enum AppMode { DEBUG, RELEASE }
@@ -16,6 +18,7 @@ class UserRepository implements AuthBase {
   final FirebaseAuthService _firebaseAuthService = locator<FirebaseAuthService>();
   final FirestoreDbService _firebaseDbService = locator<FirestoreDbService>();
   final FirebaseStorageService _firebaseStorageService = locator<FirebaseStorageService>();
+  List<UserModel> userList = [];
 
   ///Herhani bir kullanıcının olup olmamasını kontrol eder.
   @override
@@ -97,18 +100,23 @@ class UserRepository implements AuthBase {
     return result;
   }
 
-  Future<List<UserModel>> fetchAllUsers() async {
-    return await _firebaseDbService.fetchAllUsers();
+  Future<List<UserModel>> fetchAllUsers() {
+    return _firebaseDbService.fetchAllUsers();
   }
 
   Future<List<UserModel>> fetchChattedUsers(String userID) async {
-    List<ChatUserModel> chatsUsers = await _firebaseDbService.fetchChattedUsersId(userID);
-    List<String> chatUserIDList = [];
-    for (ChatUserModel chatUser in chatsUsers) {
-      chatUserIDList.add(chatUser.chatUserId);
-    }
-    List<UserModel> userModelList = await _firebaseDbService.getUsers(chatUserIDList);
-    return userModelList;
+    List<String> chatUserIDList = await getChatUserIdList(userID);
+
+    return _firebaseDbService.getChatedUsers(chatUserIDList);
+
+    /* 
+      xx dakika önce ibaresini sohbetler kısmında göster
+    
+     */
+
+    /* for (var chatUserId in chatUserIDList) {
+        _firebaseDbService.lastMessageTime(userID, chatUserId);
+    } */
   }
 
   Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
@@ -117,5 +125,14 @@ class UserRepository implements AuthBase {
 
   Future<bool> saveMessage(MessageModel messageModel) async {
     return await _firebaseDbService.saveMessage(messageModel);
+  }
+
+  Future<List<String>> getChatUserIdList(String userID) async {
+    List<ChatUserModel> chatsUsers = await _firebaseDbService.fetchChattedUsersIdList(userID);
+    List<String> chatUserIDList = [];
+    for (ChatUserModel chatUser in chatsUsers) {
+      chatUserIDList.add(chatUser.chatUserId);
+    }
+    return chatUserIDList;
   }
 }
