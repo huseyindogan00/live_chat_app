@@ -178,15 +178,12 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     return _userRepository.uploadFile(userID, fileType, fileToUpload);
   }
 
-  Future<List<UserModel>> fetchAllUsers() async {
-    List<UserModel> users = await _userRepository.fetchAllUsers();
-    return users;
+  Future<List<UserModel>> fetchAllUsers() {
+    return _userRepository.fetchAllUsers();
   }
 
-  Future<List<UserModel>> fetchChattedUsers(String userID) async {
-    List<UserModel> usersList = await _userRepository.fetchChattedUsers(userID);
-
-    return usersList;
+  Future<List<UserModel>> fetchChattedUsers(String userID) {
+    return _userRepository.fetchChattedUsers(userID);
   }
 
   Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {

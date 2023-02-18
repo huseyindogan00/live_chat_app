@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserModel {
@@ -9,6 +8,7 @@ class UserModel {
   String? phoneNumber;
   String? photoUrl;
   dynamic createAt;
+  String? lastMessageTime;
   UserModel({
     this.userID,
     this.email,
@@ -16,6 +16,7 @@ class UserModel {
     this.phoneNumber,
     this.photoUrl,
     this.createAt,
+    this.lastMessageTime,
   });
 
   UserModel copyWith({
@@ -24,7 +25,8 @@ class UserModel {
     String? userName,
     String? phoneNumber,
     String? photoUrl,
-    dynamic createAt,
+    dynamic? createAt,
+    String? lastMessageTime,
   }) {
     return UserModel(
       userID: userID ?? this.userID,
@@ -33,6 +35,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       createAt: createAt ?? this.createAt,
+      lastMessageTime: lastMessageTime ?? this.lastMessageTime,
     );
   }
 
@@ -40,10 +43,11 @@ class UserModel {
     return <String, dynamic>{
       'userID': userID,
       'email': email,
-      'userName': userName ?? email!.split('@')[0] + Random().nextInt(10000).toString(),
+      'userName': userName,
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'createAt': createAt,
+      'lastMessageTime': lastMessageTime,
     };
   }
 
@@ -55,6 +59,7 @@ class UserModel {
       phoneNumber: map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
       photoUrl: map['photoUrl'] != null ? map['photoUrl'] as String : null,
       createAt: map['createAt'] as dynamic,
+      lastMessageTime: map['lastMessageTime'] != null ? map['lastMessageTime'] as String : null,
     );
   }
 
@@ -64,7 +69,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(userID: $userID, email: $email, userName: $userName, phoneNumber: $phoneNumber, photoUrl: $photoUrl, createAt: $createAt)';
+    return 'UserModel(userID: $userID, email: $email, userName: $userName, phoneNumber: $phoneNumber, photoUrl: $photoUrl, createAt: $createAt, lastMessageTime: $lastMessageTime)';
   }
 
   @override
@@ -76,7 +81,8 @@ class UserModel {
         other.userName == userName &&
         other.phoneNumber == phoneNumber &&
         other.photoUrl == photoUrl &&
-        other.createAt == createAt;
+        other.createAt == createAt &&
+        other.lastMessageTime == lastMessageTime;
   }
 
   @override
@@ -86,6 +92,7 @@ class UserModel {
         userName.hashCode ^
         phoneNumber.hashCode ^
         photoUrl.hashCode ^
-        createAt.hashCode;
+        createAt.hashCode ^
+        lastMessageTime.hashCode;
   }
 }

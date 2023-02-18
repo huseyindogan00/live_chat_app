@@ -16,6 +16,7 @@ class FutureUsersWidget extends StatefulWidget {
 class _FutureUsersWidgetState extends State<FutureUsersWidget> {
   late final UserViewModel _userViewModel;
   late final bool _isTalks;
+  final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -27,15 +28,17 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: FutureBuilder(
+      child: FutureBuilder<List<UserModel>>(
         future: _isTalks
-            ? _userViewModel.fetchChattedUsers(_userViewModel.userModel!.userID.toString())
+            ? _userViewModel.fetchChattedUsers(_userViewModel.userModel!.userID!)
             : _userViewModel.fetchAllUsers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               List<UserModel>? users = snapshot.data;
-              return _buildListBuilder(context, users, _userViewModel);
+              return _buildUserListBuilder(users);
+
+              //return _buildListBuilder(context, users, _userViewModel);
             } else {
               return const Center(child: Text('Kayıtlı kullanıcı yoktur.'));
             }
@@ -47,16 +50,22 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     );
   }
 
-  ListView _buildListBuilder(BuildContext context, List<UserModel>? users, UserViewModel userViewModel) {
-    return ListView.builder(
-      itemCount: users!.length,
-      itemBuilder: (context, index) {
-        if (userViewModel.userModel!.userID != users[index].userID) {
-          return _buildUserCard(context, users, index);
-        } else {
-          return const SizedBox();
-        }
+  RefreshIndicator _buildUserListBuilder(List<UserModel>? users) {
+    return RefreshIndicator(
+      key: _refreshKey,
+      onRefresh: () async {
+        setState(() {});
       },
+      child: ListView.builder(
+        itemCount: users!.length,
+        itemBuilder: (context, index) {
+          if (_userViewModel.userModel!.userID != users[index].userID) {
+            return _buildUserCard(context, users, index);
+          } else {
+            return const SizedBox();
+          }
+        },
+      ),
     );
   }
 
