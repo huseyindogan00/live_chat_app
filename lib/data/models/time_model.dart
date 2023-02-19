@@ -4,19 +4,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class TimeModel {
-  TimeModel() {
-    dateTime = _getTime();
-  }
-
-  late Future<DateTime?> dateTime;
-
   final String _baseUrl = 'worldtimeapi.org/api/timezone/Europe/Istanbul';
 
-  static Future<DateTime?> _getTime() async {
-    http.Response response = await http.get(Uri.https('worldtimeapi.org', '/api/timezone/Europe/Istanbul'));
+  static Future<DateTime?> getCurrentTime() async {
+    http.Response response = await http
+        .get(Uri.https('worldtimeapi.org', '/api/timezone/Europe/Istanbul'));
     if (response.statusCode == 200) {
       Map<String, dynamic> map = jsonDecode(response.body);
-      return map['datetime'] as DateTime;
+      return DateTime.parse(map['datetime']);
     }
     return null;
   }

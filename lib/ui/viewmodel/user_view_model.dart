@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/core/init/locator/global_locator.dart';
-import 'package:live_chat_app/data/models/chat_user_model.dart';
 import 'package:live_chat_app/data/models/message_model.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/data/services/firebase_storage_service.dart';
@@ -125,10 +124,12 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<UserModel?> createUserWithEmailAndPassword(String email, String password) async {
+  Future<UserModel?> createUserWithEmailAndPassword(
+      String email, String password) async {
     try {
       state = ViewState.Busy;
-      _userModel = await _userRepository.createUserWithEmailAndPassword(email, password);
+      _userModel =
+          await _userRepository.createUserWithEmailAndPassword(email, password);
     } on FirebaseAuthException catch (e) {
       debugPrint('ViewModeldeki create user hatası ${e.message}');
     } finally {
@@ -138,12 +139,15 @@ class UserViewModel with ChangeNotifier implements AuthBase {
   }
 
   @override
-  Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
+  Future<UserModel?> signInWithEmailAndPassword(
+      String email, String password) async {
     try {
       state = ViewState.Busy;
-      _userModel = await _userRepository.signInWithEmailAndPassword(email, password);
+      _userModel =
+          await _userRepository.signInWithEmailAndPassword(email, password);
     } on FirebaseAuthException catch (e) {
-      debugPrint('ViewModeldeki sign in with email password hatası -> ${e.message}');
+      debugPrint(
+          'ViewModeldeki sign in with email password hatası -> ${e.message}');
     } finally {
       state = ViewState.Idle;
     }
@@ -174,7 +178,8 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  Future<bool> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) {
+  Future<bool> uploadFile(
+      String? userID, StrorageFileEnum fileType, File fileToUpload) {
     return _userRepository.uploadFile(userID, fileType, fileToUpload);
   }
 
@@ -186,7 +191,8 @@ class UserViewModel with ChangeNotifier implements AuthBase {
     return _userRepository.fetchChattedUsers(userID);
   }
 
-  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
+  Stream<List<MessageModel>> fetchMessage(
+      String currentUserID, String chatUserID) {
     return _userRepository.fetchMessage(currentUserID, chatUserID);
   }
 

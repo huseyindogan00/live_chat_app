@@ -8,7 +8,8 @@ class UserModel {
   String? phoneNumber;
   String? photoUrl;
   dynamic createAt;
-  String? lastMessageTime;
+  String? lastMessageTimeToString;
+  int? diffirenceToDays;
   UserModel({
     this.userID,
     this.email,
@@ -16,7 +17,8 @@ class UserModel {
     this.phoneNumber,
     this.photoUrl,
     this.createAt,
-    this.lastMessageTime,
+    this.lastMessageTimeToString,
+    this.diffirenceToDays,
   });
 
   UserModel copyWith({
@@ -26,7 +28,8 @@ class UserModel {
     String? phoneNumber,
     String? photoUrl,
     dynamic? createAt,
-    String? lastMessageTime,
+    String? lastMessageTimeToString,
+    int? diffirenceToDays,
   }) {
     return UserModel(
       userID: userID ?? this.userID,
@@ -35,7 +38,9 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       createAt: createAt ?? this.createAt,
-      lastMessageTime: lastMessageTime ?? this.lastMessageTime,
+      lastMessageTimeToString:
+          lastMessageTimeToString ?? this.lastMessageTimeToString,
+      diffirenceToDays: diffirenceToDays ?? this.diffirenceToDays,
     );
   }
 
@@ -47,7 +52,8 @@ class UserModel {
       'phoneNumber': phoneNumber,
       'photoUrl': photoUrl,
       'createAt': createAt,
-      'lastMessageTime': lastMessageTime,
+      'lastMessageTimeToString': lastMessageTimeToString,
+      'diffirenceToDays': diffirenceToDays,
     };
   }
 
@@ -56,20 +62,27 @@ class UserModel {
       userID: map['userID'] != null ? map['userID'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
       userName: map['userName'] != null ? map['userName'] as String : null,
-      phoneNumber: map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
+      phoneNumber:
+          map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
       photoUrl: map['photoUrl'] != null ? map['photoUrl'] as String : null,
       createAt: map['createAt'] as dynamic,
-      lastMessageTime: map['lastMessageTime'] != null ? map['lastMessageTime'] as String : null,
+      lastMessageTimeToString: map['lastMessageTimeToString'] != null
+          ? map['lastMessageTimeToString'] as String
+          : null,
+      diffirenceToDays: map['diffirenceToDays'] != null
+          ? map['diffirenceToDays'] as int
+          : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory UserModel.fromJson(String source) =>
+      UserModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'UserModel(userID: $userID, email: $email, userName: $userName, phoneNumber: $phoneNumber, photoUrl: $photoUrl, createAt: $createAt, lastMessageTime: $lastMessageTime)';
+    return 'UserModel(userID: $userID, email: $email, userName: $userName, phoneNumber: $phoneNumber, photoUrl: $photoUrl, createAt: $createAt, lastMessageTimeToString: $lastMessageTimeToString, diffirenceToDays: $diffirenceToDays)';
   }
 
   @override
@@ -82,7 +95,8 @@ class UserModel {
         other.phoneNumber == phoneNumber &&
         other.photoUrl == photoUrl &&
         other.createAt == createAt &&
-        other.lastMessageTime == lastMessageTime;
+        other.lastMessageTimeToString == lastMessageTimeToString &&
+        other.diffirenceToDays == diffirenceToDays;
   }
 
   @override
@@ -93,6 +107,7 @@ class UserModel {
         phoneNumber.hashCode ^
         photoUrl.hashCode ^
         createAt.hashCode ^
-        lastMessageTime.hashCode;
+        lastMessageTimeToString.hashCode ^
+        diffirenceToDays.hashCode;
   }
 }

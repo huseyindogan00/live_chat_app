@@ -11,7 +11,8 @@ abstract class DBBase {
   Future<List<UserModel>> fetchAllUsers();
   Future<List<ChatUserModel>> fetchChattedUsersIdList(String userID);
   Future<List<UserModel>> getChatedUsers(List<String> chatUserIDList);
-  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID);
+  Stream<List<MessageModel>> fetchMessage(
+      String currentUserID, String chatUserID);
   Future<bool> saveMessage(MessageModel messageModel);
-  Future<DateTime?> getCurrentTime(String userID);
+  Future<DateTime?> getCurrentTime();
 }

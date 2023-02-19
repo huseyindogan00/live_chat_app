@@ -5,7 +5,8 @@ import 'package:live_chat_app/ui/pages/talk/talk_page.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 
 class FutureUsersWidget extends StatefulWidget {
-  FutureUsersWidget({super.key, required this.userViewModel, this.isTalks = false});
+  FutureUsersWidget(
+      {super.key, required this.userViewModel, this.isTalks = false});
   final UserViewModel userViewModel;
   bool isTalks;
 
@@ -16,7 +17,10 @@ class FutureUsersWidget extends StatefulWidget {
 class _FutureUsersWidgetState extends State<FutureUsersWidget> {
   late final UserViewModel _userViewModel;
   late final bool _isTalks;
-  final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshKey =
+      GlobalKey<RefreshIndicatorState>();
+  final GlobalKey<RefreshIndicatorState> _refreshKey2 =
+      GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
@@ -30,17 +34,16 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     return Center(
       child: FutureBuilder<List<UserModel>>(
         future: _isTalks
-            ? _userViewModel.fetchChattedUsers(_userViewModel.userModel!.userID!)
+            ? _userViewModel
+                .fetchChattedUsers(_userViewModel.userModel!.userID!)
             : _userViewModel.fetchAllUsers(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               List<UserModel>? users = snapshot.data;
               return _buildUserListBuilder(users);
-
-              //return _buildListBuilder(context, users, _userViewModel);
             } else {
-              return const Center(child: Text('Kayıtlı kullanıcı yoktur.'));
+              return _buildIsUserNull(context);
             }
           } else {
             return const CircularProgressIndicator();
@@ -60,7 +63,7 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
         itemCount: users!.length,
         itemBuilder: (context, index) {
           if (_userViewModel.userModel!.userID != users[index].userID) {
-            return _buildUserCard(context, users, index);
+            return _buildUserCard(context, users[index]);
           } else {
             return const SizedBox();
           }
@@ -69,18 +72,29 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     );
   }
 
-  Card _buildUserCard(BuildContext context, List<UserModel> users, int index) {
+  Card _buildUserCard(BuildContext context, UserModel users) {
     return Card(
       child: InkWell(
         onTap: () => Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
-            builder: (context) => TalkPage(chatUser: users[index], currentUser: _userViewModel.userModel!),
+            builder: (context) => TalkPage(
+                chatUser: users, currentUser: _userViewModel.userModel!),
           ),
         ),
         child: ListTile(
-          leading: users[index].photoUrl != null ? _buildProfilePhoto(users, index) : _buildDefaultProfilePhoto(),
-          title: Text(users[index].userName.toString()),
-          subtitle: Text(users[index].email.toString()),
+          leading: users.photoUrl != null
+              ? _buildProfilePhoto(users)
+              : _buildDefaultProfilePhoto(),
+          title: Text(users.email.toString()),
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(users.userName.toString()),
+              users.lastMessageTimeToString == null
+                  ? const SizedBox()
+                  : Text(users.lastMessageTimeToString.toString()),
+            ],
+          ),
         ),
       ),
     );
@@ -91,10 +105,28 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
         backgroundImage: AssetImage(ImageConstPath.defaultProfilePhoto),
       );
 
-  CircleAvatar _buildProfilePhoto(List<UserModel> users, int index) {
+  CircleAvatar _buildProfilePhoto(UserModel users) {
     return CircleAvatar(
-      backgroundImage: NetworkImage(users[index].photoUrl!),
+      backgroundImage: NetworkImage(users.photoUrl!),
       maxRadius: 25,
+    );
+  }
+
+  // hiç bir kullanıcı bulunamadığında
+  RefreshIndicator _buildIsUserNull(BuildContext context) {
+    return RefreshIndicator(
+      key: _refreshKey2,
+      onRefresh: () async {
+        setState(() {});
+      },
+      child: Stack(
+        children: [
+          ListView(children: [
+            SizedBox(height: MediaQuery.of(context).size.height * 0.4),
+            const Center(child: Text('Kayıtlı kullanıcı yoktur'))
+          ]),
+        ],
+      ),
     );
   }
 }
