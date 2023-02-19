@@ -38,8 +38,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       photoUrl: photoUrl ?? this.photoUrl,
       createAt: createAt ?? this.createAt,
-      lastMessageTimeToString:
-          lastMessageTimeToString ?? this.lastMessageTimeToString,
+      lastMessageTimeToString: lastMessageTimeToString ?? this.lastMessageTimeToString,
       diffirenceToDays: diffirenceToDays ?? this.diffirenceToDays,
     );
   }
@@ -62,23 +61,17 @@ class UserModel {
       userID: map['userID'] != null ? map['userID'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
       userName: map['userName'] != null ? map['userName'] as String : null,
-      phoneNumber:
-          map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
+      phoneNumber: map['phoneNumber'] != null ? map['phoneNumber'] as String : null,
       photoUrl: map['photoUrl'] != null ? map['photoUrl'] as String : null,
       createAt: map['createAt'] as dynamic,
-      lastMessageTimeToString: map['lastMessageTimeToString'] != null
-          ? map['lastMessageTimeToString'] as String
-          : null,
-      diffirenceToDays: map['diffirenceToDays'] != null
-          ? map['diffirenceToDays'] as int
-          : null,
+      lastMessageTimeToString: map['lastMessageTimeToString'] != null ? map['lastMessageTimeToString'] as String : null,
+      diffirenceToDays: map['diffirenceToDays'] != null ? map['diffirenceToDays'] as int : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory UserModel.fromJson(String source) =>
-      UserModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory UserModel.fromJson(String source) => UserModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {

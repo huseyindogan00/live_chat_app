@@ -20,10 +20,7 @@ class FirestoreDbService implements DBBase {
   Future<bool> saveUser(UserModel userModel) async {
     userModel.createAt = FieldValue.serverTimestamp();
 
-    await _firestore
-        .collection('users')
-        .doc(userModel.userID)
-        .set(userModel.toMap());
+    await _firestore.collection('users').doc(userModel.userID).set(userModel.toMap());
 /* 
     DocumentSnapshot snapshot = await _firestore.doc('users/${userModel.userID}').get();
     Map<String, dynamic> _readUser = snapshot.data() as Map<String, dynamic>;
@@ -35,11 +32,9 @@ class FirestoreDbService implements DBBase {
   /// Verilen userID'ye ait User'ı Firebase'den getirerek UserModel nesnesine dönüştürür ve geriye UserModel döner.
   @override
   Future<UserModel> readUser(String userID) async {
-    DocumentSnapshot _readUserSapshot =
-        await _firestore.collection('users').doc(userID).get();
+    DocumentSnapshot _readUserSapshot = await _firestore.collection('users').doc(userID).get();
 
-    Map<String, dynamic> _readUserMap =
-        _readUserSapshot.data() as Map<String, dynamic>;
+    Map<String, dynamic> _readUserMap = _readUserSapshot.data() as Map<String, dynamic>;
 
     UserModel userModel = UserModel.fromMap(_readUserMap);
 
@@ -48,15 +43,9 @@ class FirestoreDbService implements DBBase {
 
   @override
   Future<bool> updateUserName(String userID, String newUserName) async {
-    QuerySnapshot result = await _firestore
-        .collection('users')
-        .where('userName', isEqualTo: newUserName)
-        .get();
+    QuerySnapshot result = await _firestore.collection('users').where('userName', isEqualTo: newUserName).get();
     if (result.docs.isEmpty) {
-      await _firestore
-          .collection('users')
-          .doc(userID)
-          .update({'userName': newUserName});
+      await _firestore.collection('users').doc(userID).update({'userName': newUserName});
       return true;
     } else {
       return false;
@@ -73,10 +62,8 @@ class FirestoreDbService implements DBBase {
   Future<List<UserModel>> fetchAllUsers() async {
     List<UserModel> userList = [];
 
-    QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
-        .collection('users')
-        .orderBy('createAt', descending: true)
-        .get();
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await _firestore.collection('users').orderBy('createAt', descending: true).get();
 
     for (var userMap in snapshot.docs) {
       userList.add(UserModel.fromMap(userMap.data()));
@@ -89,11 +76,8 @@ class FirestoreDbService implements DBBase {
   @override
   Future<List<ChatUserModel>> fetchChattedUsersIdList(String userID) async {
     List<ChatUserModel> chatUserList = [];
-    QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firestore
-        .collection('users')
-        .doc(userID)
-        .collection('chatUsers')
-        .get();
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await _firestore.collection('users').doc(userID).collection('chatUsers').get();
 
     for (var chatUser in querySnapshot.docs) {
       chatUserList.add(ChatUserModel.fromMap(chatUser.data()));
@@ -116,8 +100,7 @@ class FirestoreDbService implements DBBase {
 
   /// Verilen chatUserID ile olan mesajları tarih sırasına göre bir listede döner.
   @override
-  Stream<List<MessageModel>> fetchMessage(
-      String currentUserID, String chatUserID) {
+  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
     Stream<QuerySnapshot<Map<String, dynamic>>> snapshot = _firestore
         .collection('users')
         .doc(currentUserID)
@@ -127,10 +110,8 @@ class FirestoreDbService implements DBBase {
         .orderBy('date', descending: true)
         .snapshots();
 
-    Stream<List<MessageModel>> messageList = snapshot.map((mapStreamMessage) =>
-        mapStreamMessage.docs
-            .map((dataMap) => MessageModel.fromMap(dataMap.data()))
-            .toList());
+    Stream<List<MessageModel>> messageList = snapshot.map(
+        (mapStreamMessage) => mapStreamMessage.docs.map((dataMap) => MessageModel.fromMap(dataMap.data())).toList());
 
     return messageList;
   }
@@ -146,7 +127,7 @@ class FirestoreDbService implements DBBase {
         .collection('message')
         .add(messageModel.toMap());
 
-    //Kaydedilen mesaja ait kimeId si kullanıcının chatUsers collectionuna yazılıyor
+    //Kaydedilen mesaja ait whoId si kullanıcının chatUsers collectionuna yazılıyor
     await _firestore
         .collection('users')
         .doc(messageModel.fromWhoID)
@@ -163,12 +144,18 @@ class FirestoreDbService implements DBBase {
         .doc('${messageModel.whoID}--${messageModel.fromWhoID}')
         .collection('message')
         .add(messageModel.toMap());
+
+    await _firestore
+        .collection('users')
+        .doc(messageModel.whoID)
+        .collection('chatUsers')
+        .doc(messageModel.fromWhoID)
+        .set({'chatUserId': messageModel.fromWhoID});
     return true;
   }
 
   /// atılan son mesajın üzerinden geçen zamanı String olarak geriye döndürür.
-  Future<void> lastMessageTimeToString(
-      String currentUserID, UserModel chatUser) async {
+  Future<void> lastMessageTimeToString(String currentUserID, UserModel chatUser) async {
     QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
         .collection('users')
         .doc(currentUserID)
@@ -184,12 +171,16 @@ class FirestoreDbService implements DBBase {
 
     DateTime lastMessageTime = (mapMessage['date'] as Timestamp).toDate();
     DateTime? currentTime = await getCurrentTime();
-    Duration _duration = currentTime!.difference(lastMessageTime);
-
-    chatUser.diffirenceToDays = _duration.inMinutes;
-    chatUser.lastMessageTimeToString =
-        timeago.format(currentTime.subtract(_duration), locale: 'tr');
-
+    if (currentTime != null) {
+      Duration duration = currentTime.difference(lastMessageTime);
+      chatUser.diffirenceToDays = duration
+          .inMinutes; // userları kendi içinde sıralamak için mevcut zamandan mesajın atıldığı zaman arasında kalan zamanı dakikaya çeviriyoruz
+      chatUser.lastMessageTimeToString = timeago.format(currentTime.subtract(duration), locale: 'tr');
+      return;
+    }
+    // eğer o anki zaman api kaynağından getirilemez ise default değerleri ver
+    chatUser.diffirenceToDays = 0;
+    chatUser.lastMessageTimeToString = '';
     return;
   }
 
