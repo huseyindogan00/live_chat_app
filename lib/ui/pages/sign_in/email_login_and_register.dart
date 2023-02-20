@@ -53,6 +53,7 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
       child: Column(
         children: [
           TextFormField(
+            initialValue: 'huseyin03@dgn.com',
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               errorText: _userViewModel.emailErrorMessage.isNotEmpty ? _userViewModel.emailErrorMessage : null,
@@ -68,6 +69,7 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
           ),
           const SizedBox(height: 10),
           TextFormField(
+            initialValue: '123456',
             maxLength: 10,
             obscureText: true,
             decoration: InputDecoration(
@@ -129,7 +131,6 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
         }
       } else {
         createUser = await _userViewModel.createUserWithEmailAndPassword(_email!, _password!);
-        _userViewModel.userModel = createUser;
         if (_formType == FormType.REGISTER && createUser == null) {
           // ignore: use_build_context_synchronously
           await const PlatformSensitiveAlertDialog(
@@ -137,6 +138,8 @@ class _EmailLoginAndRegisterState extends State<EmailLoginAndRegister> {
             title: 'Uyarı!',
             doneButtonTitle: DialogActionText.done,
           ).show(context);
+        } else {
+          _userViewModel.userModel = createUser;
         }
       }
     }

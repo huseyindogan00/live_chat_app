@@ -13,11 +13,9 @@ import 'package:live_chat_app/data/services/interface/auth_base.dart';
 enum AppMode { DEBUG, RELEASE }
 
 class UserRepository implements AuthBase {
-  final FirebaseAuthService _firebaseAuthService =
-      locator<FirebaseAuthService>();
+  final FirebaseAuthService _firebaseAuthService = locator<FirebaseAuthService>();
   final FirestoreDbService _firebaseDbService = locator<FirestoreDbService>();
-  final FirebaseStorageService _firebaseStorageService =
-      locator<FirebaseStorageService>();
+  final FirebaseStorageService _firebaseStorageService = locator<FirebaseStorageService>();
   List<UserModel> userList = [];
 
   ///Herhani bir kullanıcının olup olmamasını kontrol eder.
@@ -52,8 +50,7 @@ class UserRepository implements AuthBase {
     return _userModel;
   }
 
-  @Deprecated(
-      'Facebook ile bağlantı başarısız oldu. Gerekli bağlantılar yapılacaktır.')
+  @Deprecated('Facebook ile bağlantı başarısız oldu. Gerekli bağlantılar yapılacaktır.')
   @override
   Future<UserModel?> signInWithFacebook() async {
     //return await _firebaseAuthService.signInWithFacebook();
@@ -64,10 +61,8 @@ class UserRepository implements AuthBase {
   ///
   ///Kaydedilen kullanıcı bilgilerini Firestore'dan okuyarak geriye UserModel döner.
   @override
-  Future<UserModel?> createUserWithEmailAndPassword(
-      String email, String password) async {
-    UserModel? _userModel = await _firebaseAuthService
-        .createUserWithEmailAndPassword(email, password);
+  Future<UserModel?> createUserWithEmailAndPassword(String email, String password) async {
+    UserModel? _userModel = await _firebaseAuthService.createUserWithEmailAndPassword(email, password);
 
     if (_userModel != null) {
       bool result = await _firebaseDbService.saveUser(_userModel);
@@ -85,10 +80,8 @@ class UserRepository implements AuthBase {
   ///
   ///Eğer bilgiler doğruysa, Firestore'dan mevcut kullanıcı bilgilerini okur ve geriye UserModel döner.
   @override
-  Future<UserModel?> signInWithEmailAndPassword(
-      String email, String password) async {
-    UserModel? _userModel =
-        await _firebaseAuthService.signInWithEmailAndPassword(email, password);
+  Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
+    UserModel? _userModel = await _firebaseAuthService.signInWithEmailAndPassword(email, password);
     if (_userModel != null) {
       _userModel = await _firebaseDbService.readUser(_userModel.userID!);
     }
@@ -99,10 +92,8 @@ class UserRepository implements AuthBase {
     return await _firebaseDbService.updateUserName(userID, newUserName);
   }
 
-  Future<bool> uploadFile(
-      String? userID, StrorageFileEnum fileType, File fileToUpload) async {
-    String url = await _firebaseStorageService.uploadFile(
-        userID!, fileType, fileToUpload);
+  Future<bool> uploadFile(String? userID, StrorageFileEnum fileType, File fileToUpload) async {
+    String url = await _firebaseStorageService.uploadFile(userID!, fileType, fileToUpload);
     bool result = await _firebaseDbService.updatePhotoUrl(userID, url);
     return result;
   }
@@ -114,20 +105,17 @@ class UserRepository implements AuthBase {
   Future<List<UserModel>> fetchChattedUsers(String userID) async {
     List<String> chatUserIDList = await getChatUserIdList(userID);
 
-    List<UserModel> chatUserModelList =
-        await _firebaseDbService.getChatedUsers(chatUserIDList);
+    List<UserModel> chatUserModelList = await _firebaseDbService.getChatedUsers(chatUserIDList);
 
     for (UserModel chatUser in chatUserModelList) {
       await _firebaseDbService.lastMessageTimeToString(userID, chatUser);
     }
-    chatUserModelList.sort((user1, user2) =>
-        user1.diffirenceToDays!.compareTo(user2.diffirenceToDays!));
+    chatUserModelList.sort((user1, user2) => user1.diffirenceToDays!.compareTo(user2.diffirenceToDays!));
 
     return chatUserModelList;
   }
 
-  Stream<List<MessageModel>> fetchMessage(
-      String currentUserID, String chatUserID) {
+  Stream<List<MessageModel>> fetchMessage(String currentUserID, String chatUserID) {
     return _firebaseDbService.fetchMessage(currentUserID, chatUserID);
   }
 
@@ -136,12 +124,15 @@ class UserRepository implements AuthBase {
   }
 
   Future<List<String>> getChatUserIdList(String userID) async {
-    List<ChatUserModel> chatsUsers =
-        await _firebaseDbService.fetchChattedUsersIdList(userID);
+    List<ChatUserModel> chatsUsers = await _firebaseDbService.fetchChattedUsersIdList(userID);
     List<String> chatUserIDList = [];
     for (ChatUserModel chatUser in chatsUsers) {
       chatUserIDList.add(chatUser.chatUserId);
     }
     return chatUserIDList;
+  }
+
+  Future<List<UserModel>> fetchUsersWithPagination(UserModel? endUserModel, int numberOfPages) async {
+    return await _firebaseDbService.fetchUsersWithPagination(endUserModel, numberOfPages);
   }
 }

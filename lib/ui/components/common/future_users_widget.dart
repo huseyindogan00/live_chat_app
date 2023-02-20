@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:live_chat_app/core/constant/image/image_const_path.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/pages/talk/talk_page.dart';
@@ -8,8 +9,7 @@ import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 class FutureUsersWidget extends StatefulWidget {
-  FutureUsersWidget(
-      {super.key, required this.userViewModel, this.isTalks = false});
+  FutureUsersWidget({super.key, required this.userViewModel, this.isTalks = false});
   final UserViewModel userViewModel;
   bool isTalks;
 
@@ -18,25 +18,30 @@ class FutureUsersWidget extends StatefulWidget {
 }
 
 class _FutureUsersWidgetState extends State<FutureUsersWidget> {
-  List<UserModel> _allUsersModel = [];
+  List<UserModel>? _allUsersModel;
   bool _isLoading = false;
   bool _hasMore = true;
-  int _pageCount = 5;
+  final int _numberOfPages = 3;
   UserModel? _endUserModel;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
+
+    //build methodu tetiklediğinde contextte ihtiyaç duyan methotları burada çalıştırırız
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      fetchUser();
+    });
+
+    _buildScrollController();
+  }
+
+  void _buildScrollController() {
     _scrollController.addListener(
-      () {
+      () async {
         if (_scrollController.position.atEdge) {
-          print('kenarda');
-          if (_scrollController.position == 0) {
-            print('liste başta');
-          } else {
-            fetchUser(_endUserModel);
-          }
+          await fetchUser();
         }
       },
     );
@@ -44,22 +49,17 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
 
   @override
   Widget build(BuildContext context) {
-    UserViewModel _userViewModel = Provider.of<UserViewModel>(context);
     return Column(
       children: [
         Expanded(
-          child: _allUsersModel.isEmpty
-              ? const Center(child: Text('kullanıcı yok'))
-              : _buildUserList(),
+          child: _allUsersModel == null ? const Center(child: Text('kullanıcı yok')) : _buildUserList(),
         ),
-        _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Container(),
+        _isLoading ? const Center(child: CircularProgressIndicator()) : Container(),
         Expanded(
           child: FloatingActionButton(
             child: const Text('Getir'),
-            onPressed: () {
-              fetchUser(_endUserModel);
+            onPressed: () async {
+              await fetchUser();
             },
           ),
         ),
@@ -67,43 +67,61 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     );
   }
 
-  fetchUser(UserModel? endUserModel) async {
+  Future<void> fetchUser() async {
+    UserViewModel _userViewModel = Provider.of<UserViewModel>(context, listen: false);
+    if (!_hasMore) {
+      return;
+    }
+    if (_isLoading) {
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
 
-    var firebase = FirebaseFirestore.instance;
-    QuerySnapshot<Map<String, dynamic>> snapshot;
-    if (endUserModel == null) {
-      snapshot =
-          await firebase.collection('users').orderBy('userName').limit(3).get();
+    List<UserModel> _usersList = await _userViewModel.fetchUsersWithPagination(_endUserModel, _numberOfPages);
+
+    if (_allUsersModel == null) {
+      _allUsersModel = [];
+      _allUsersModel!.addAll(_usersList);
     } else {
-      snapshot = await firebase
-          .collection('users')
-          .orderBy('userName')
-          .startAfter([endUserModel.userName])
-          .limit(3)
-          .get();
+      _allUsersModel!.addAll(_usersList);
     }
 
-    for (var data in snapshot.docs) {
-      _allUsersModel.add(UserModel.fromMap(data.data()));
+    // eğer getirilecek eleman başka yoksa
+    if (_usersList.length < _numberOfPages) {
+      _hasMore = false;
     }
 
-    _endUserModel = _allUsersModel.last;
+    _endUserModel = _allUsersModel!.last;
 
     setState(() {
       _isLoading = false;
     });
+    return;
+
+    print('gösterilecek başka kullanıcı kalmadı');
   }
 
   _buildUserList() {
     return ListView.builder(
       controller: _scrollController,
-      itemCount: _allUsersModel.length,
+      itemCount: _allUsersModel!.length + 1,
       itemBuilder: (context, index) {
+        if (index == _allUsersModel!.length) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Opacity(
+                opacity: _isLoading ? 1 : 0,
+                child: _isLoading ? const SingleChildScrollView() : null,
+              ),
+            ),
+          );
+        }
         return ListTile(
-          title: Text(_allUsersModel[index].userName.toString()),
+          title: Text(_allUsersModel![index].userName.toString()),
         );
       },
     );

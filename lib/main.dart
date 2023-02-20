@@ -6,7 +6,7 @@ import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); // başlatıldığından emin ol
 
   await Firebase.initializeApp();
   setupLocator();
