@@ -57,43 +57,8 @@ RefreshIndicator _buildUserListBuilder(List<UserModel>? users) {
       ),
     );
   }
-
-  Card _buildUserCard(BuildContext context, UserModel users) {
-    return Card(
-      child: InkWell(
-        onTap: () => Navigator.of(context, rootNavigator: true).push(
-          MaterialPageRoute(
-            builder: (context) => TalkPage(chatUser: users, currentUser: _userViewModel.userModel!),
-          ),
-        ),
-        child: ListTile(
-          leading: users.photoUrl != null ? _buildProfilePhoto(users) : _buildDefaultProfilePhoto(),
-          title: Text(users.email.toString()),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(users.userName.toString()),
-              users.lastMessageTimeToString != null && users.lastMessageTimeToString!.isNotEmpty
-                  ? Text(users.lastMessageTimeToString.toString())
-                  : Text('süre alınamadı'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  CircleAvatar _buildDefaultProfilePhoto() => CircleAvatar(
-        maxRadius: 25,
-        backgroundImage: AssetImage(ImageConstPath.defaultProfilePhoto),
-      );
-
-  CircleAvatar _buildProfilePhoto(UserModel users) {
-    return CircleAvatar(
-      backgroundImage: NetworkImage(users.photoUrl!),
-      maxRadius: 25,
-    );
-  }
+ 
+ 
 
   // hiç bir kullanıcı bulunamadığında
   RefreshIndicator _buildIsUserNull(BuildContext context) {

@@ -1,10 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:live_chat_app/core/constant/image/image_const_path.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
-import 'package:live_chat_app/ui/pages/talk/talk_page.dart';
+import 'package:live_chat_app/ui/components/common/card/user_card.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +37,9 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
   void _buildScrollController() {
     _scrollController.addListener(
       () async {
-        if (_scrollController.position.atEdge) {
+        if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
+            _scrollController.position.outOfRange) {
+          print('scroll çalıştı');
           await fetchUser();
         }
       },
@@ -52,10 +51,12 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     return Column(
       children: [
         Expanded(
+          flex: 6,
           child: _allUsersModel == null ? const Center(child: Text('kullanıcı yok')) : _buildUserList(),
         ),
         _isLoading ? const Center(child: CircularProgressIndicator()) : Container(),
         Expanded(
+          flex: 2,
           child: FloatingActionButton(
             child: const Text('Getir'),
             onPressed: () async {
@@ -99,9 +100,9 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     setState(() {
       _isLoading = false;
     });
-    return;
 
     print('gösterilecek başka kullanıcı kalmadı');
+    return;
   }
 
   _buildUserList() {
@@ -110,6 +111,7 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
       itemCount: _allUsersModel!.length + 1,
       itemBuilder: (context, index) {
         if (index == _allUsersModel!.length) {
+          print('liste singlechildscrollview çalıştı');
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: Center(
@@ -120,9 +122,7 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
             ),
           );
         }
-        return ListTile(
-          title: Text(_allUsersModel![index].userName.toString()),
-        );
+        return UserCard(users: _allUsersModel![index]);
       },
     );
   }

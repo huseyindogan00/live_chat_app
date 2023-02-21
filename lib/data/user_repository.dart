@@ -16,7 +16,7 @@ class UserRepository implements AuthBase {
   final FirebaseAuthService _firebaseAuthService = locator<FirebaseAuthService>();
   final FirestoreDbService _firebaseDbService = locator<FirestoreDbService>();
   final FirebaseStorageService _firebaseStorageService = locator<FirebaseStorageService>();
-  List<UserModel> userList = [];
+  List<UserModel> allUserList = [];
 
   ///Herhani bir kullanıcının olup olmamasını kontrol eder.
   @override

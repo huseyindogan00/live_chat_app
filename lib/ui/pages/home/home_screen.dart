@@ -7,6 +7,8 @@ import 'package:live_chat_app/ui/pages/profile/profile_page.dart';
 import 'package:live_chat_app/ui/pages/talk/my_talks_page.dart';
 import 'package:live_chat_app/ui/pages/users/users_page.dart';
 import 'package:live_chat_app/ui/components/common/bottom_navi/my_custom_bottom_navi.dart';
+import 'package:live_chat_app/ui/viewmodel/all_users_view_model.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key, required this.userModel});
@@ -21,7 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
   TabItemEnum _currentTab = TabItemEnum.USERS;
 
   Map<TabItemEnum, Widget> get pageAll => {
-        TabItemEnum.USERS: UsersPage(),
+        TabItemEnum.USERS: ChangeNotifierProvider(
+          create: (context) => AllUsersViewModel(),
+          builder: (context, child) => UsersPage(),
+        ),
         TabItemEnum.TALKS: const MyTalksPage(),
         TabItemEnum.PROFILE: const ProfilePage(),
       };
