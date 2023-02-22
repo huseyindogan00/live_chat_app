@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/components/common/card/user_card.dart';
+import 'package:live_chat_app/ui/viewmodel/all_users_view_model.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -25,12 +26,10 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
   @override
   void initState() {
     super.initState();
-
     //build methodu tetiklediğinde contextte ihtiyaç duyan methotları burada çalıştırırız
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      fetchUser();
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      await fetchUser();
     });
-
     _buildScrollController();
   }
 
@@ -39,7 +38,6 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
       () async {
         if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
             _scrollController.position.outOfRange) {
-          print('scroll çalıştı');
           await fetchUser();
         }
       },
@@ -48,23 +46,49 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          flex: 6,
-          child: _allUsersModel == null ? const Center(child: Text('kullanıcı yok')) : _buildUserList(),
-        ),
-        _isLoading ? const Center(child: CircularProgressIndicator()) : Container(),
-        Expanded(
-          flex: 2,
-          child: FloatingActionButton(
-            child: const Text('Getir'),
-            onPressed: () async {
-              await fetchUser();
-            },
+    return Consumer<AllUsersViewModel>(
+      builder: (context, allUserViewModel, child) {
+        return allUserViewModel.viewState == AllUserViewState.BUSY
+            ? const Center(child: CircularProgressIndicator())
+            : allUserViewModel.viewState == AllUserViewState.LOADED
+                ? Column(
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: _allUsersModel == null ? const Center(child: Text('kullanıcı yok')) : _buildUserList(),
+                      ),
+                      _isLoading ? const Center(child: CircularProgressIndicator()) : Container(),
+                      Expanded(
+                        flex: 2,
+                        child: FloatingActionButton(
+                          child: const Text('Getir'),
+                          onPressed: () async {
+                            await fetchUser();
+                          },
+                        ),
+                      ),
+                    ],
+                  )
+                : const Text('busy ve loaded değil');
+      },
+      /* child: Column(
+        children: [
+          Expanded(
+            flex: 6,
+            child: _allUsersModel == null ? const Center(child: Text('kullanıcı yok')) : _buildUserList(),
           ),
-        ),
-      ],
+          _isLoading ? const Center(child: CircularProgressIndicator()) : Container(),
+          Expanded(
+            flex: 2,
+            child: FloatingActionButton(
+              child: const Text('Getir'),
+              onPressed: () async {
+                await fetchUser();
+              },
+            ),
+          ),
+        ],
+      ), */
     );
   }
 

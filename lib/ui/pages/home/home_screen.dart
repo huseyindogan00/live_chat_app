@@ -23,10 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TabItemEnum _currentTab = TabItemEnum.USERS;
 
   Map<TabItemEnum, Widget> get pageAll => {
-        TabItemEnum.USERS: ChangeNotifierProvider(
-          create: (context) => AllUsersViewModel(),
-          builder: (context, child) => UsersPage(),
-        ),
+        TabItemEnum.USERS: UsersPage(),
         TabItemEnum.TALKS: const MyTalksPage(),
         TabItemEnum.PROFILE: const ProfilePage(),
       };
