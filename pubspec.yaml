@@ -46,6 +46,11 @@ dependencies:
   firebase_storage: ^11.0.10
   http: ^0.13.5
   timeago: ^3.3.0
+  firebase_messaging: ^14.2.5
+  flutter_local_notifications: ^13.0.0
+
+
+  
 
 dev_dependencies:
   flutter_test:

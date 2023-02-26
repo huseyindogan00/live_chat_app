@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:live_chat_app/core/constant/image/image_const_path.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/pages/talk/talk_page.dart';
+import 'package:live_chat_app/ui/viewmodel/all_users_view_model.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
 import 'package:provider/provider.dart';
 
@@ -9,10 +10,12 @@ class UserCard extends StatelessWidget {
   UserCard({super.key, required this.users});
 
   UserModel users;
+  late AllUsersViewModel allUsersViewModel;
   late UserViewModel userViewModel;
 
   @override
   Widget build(BuildContext context) {
+    allUsersViewModel = Provider.of<AllUsersViewModel>(context);
     userViewModel = Provider.of<UserViewModel>(context);
     return Card(
       child: InkWell(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:live_chat_app/data/models/user_model.dart';
 import 'package:live_chat_app/ui/components/common/card/user_card.dart';
 import 'package:live_chat_app/ui/viewmodel/all_users_view_model.dart';
 import 'package:live_chat_app/ui/viewmodel/user_view_model.dart';
@@ -16,20 +15,22 @@ class FutureUsersWidget extends StatefulWidget {
 }
 
 class _FutureUsersWidgetState extends State<FutureUsersWidget> {
-  List<UserModel>? _allUsersModel;
+  /* List<UserModel>? _allUsersModel;
   bool _isLoading = false;
   bool _hasMore = true;
   final int _numberOfPages = 3;
-  UserModel? _endUserModel;
+  UserModel? _endUserModel; */
   final ScrollController _scrollController = ScrollController();
+  late AllUsersViewModel allUsersViewModel;
 
   @override
   void initState() {
     super.initState();
     //build methodu tetiklediğinde contextte ihtiyaç duyan methotları burada çalıştırırız
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      await fetchUser();
+      allUsersViewModel = Provider.of<AllUsersViewModel>(context, listen: false);
     });
+
     _buildScrollController();
   }
 
@@ -37,8 +38,8 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     _scrollController.addListener(
       () async {
         if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
-            _scrollController.position.outOfRange) {
-          await fetchUser();
+            !_scrollController.position.outOfRange) {
+          //await allUsersViewModel.moreUser();
         }
       },
     );
@@ -55,17 +56,9 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
                     children: [
                       Expanded(
                         flex: 6,
-                        child: _allUsersModel == null ? const Center(child: Text('kullanıcı yok')) : _buildUserList(),
-                      ),
-                      _isLoading ? const Center(child: CircularProgressIndicator()) : Container(),
-                      Expanded(
-                        flex: 2,
-                        child: FloatingActionButton(
-                          child: const Text('Getir'),
-                          onPressed: () async {
-                            await fetchUser();
-                          },
-                        ),
+                        child: allUserViewModel.allUsersList == null
+                            ? const Center(child: Text('kullanıcı yok'))
+                            : _buildUserList(allUserViewModel),
                       ),
                     ],
                   )
@@ -92,7 +85,7 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
     );
   }
 
-  Future<void> fetchUser() async {
+  /* Future<void> fetchUser() async {
     UserViewModel _userViewModel = Provider.of<UserViewModel>(context, listen: false);
     if (!_hasMore) {
       return;
@@ -127,27 +120,26 @@ class _FutureUsersWidgetState extends State<FutureUsersWidget> {
 
     print('gösterilecek başka kullanıcı kalmadı');
     return;
-  }
+  } */
 
-  _buildUserList() {
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: _allUsersModel!.length + 1,
-      itemBuilder: (context, index) {
-        if (index == _allUsersModel!.length) {
-          print('liste singlechildscrollview çalıştı');
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Opacity(
-                opacity: _isLoading ? 1 : 0,
-                child: _isLoading ? const SingleChildScrollView() : null,
+  Widget _buildUserList(AllUsersViewModel allUserModelList) {
+    return RefreshIndicator(
+      onRefresh: () async => await allUsersViewModel.refresh(),
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: allUserModelList.allUsersList!.length + 1,
+        itemBuilder: (context, index) {
+          if (index == allUserModelList.allUsersList!.length) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: allUserModelList.viewState == ViewState.Idle ? const SingleChildScrollView() : null,
               ),
-            ),
-          );
-        }
-        return UserCard(users: _allUsersModel![index]);
-      },
+            );
+          }
+          return UserCard(users: allUserModelList.allUsersList![index]);
+        },
+      ),
     );
   }
 }

@@ -1,8 +1,12 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:live_chat_app/data/models/user_model.dart';
+import 'package:live_chat_app/data/services/firebase_notification_service.dart';
 import 'package:live_chat_app/ui/components/common/bottom_navi/tab_item.dart';
+import 'package:live_chat_app/ui/components/common/platform_sensitive_alert_dialog.dart';
 import 'package:live_chat_app/ui/pages/profile/profile_page.dart';
 import 'package:live_chat_app/ui/pages/talk/my_talks_page.dart';
 import 'package:live_chat_app/ui/pages/users/users_page.dart';
@@ -38,6 +42,21 @@ class _HomeScreenState extends State<HomeScreen> {
         TabItemEnum.TALKS: talksNavState,
       };
 
+  final notificationServise = FirebaseNotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    notificationServise.connectNotification();
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      PlatformSensitiveAlertDialog(
+        content: event.data['message'].toString(),
+        title: event.data['title'] + event.data['name'],
+        doneButtonTitle: 'Tamam',
+      ).show(context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     //final _userViewModel = Provider.of<UserViewModel>(context);
@@ -61,4 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+Future<void> firebaseMessage(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Arka planda bildiirim yakalandı ${message.data['name']}');
 }

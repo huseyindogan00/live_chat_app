@@ -14,11 +14,13 @@ class AllUsersViewModel with ChangeNotifier {
   List<UserModel>? _allUsers;
   AllUserViewState _viewState = AllUserViewState.IDLE;
   UserModel? _endUser;
+  bool _hasMore = true;
   int _numberOfPages = 3;
   final UserRepository _userRepository = locator<UserRepository>();
 
   List<UserModel>? get allUsersList => _allUsers;
   AllUserViewState get viewState => _viewState;
+  bool get hasMoreLoading => _hasMore;
 
   set viewState(AllUserViewState value) {
     _viewState = value;
@@ -28,12 +30,28 @@ class AllUsersViewModel with ChangeNotifier {
   AllUsersViewModel([this._allUsers, this._endUser]) {
     _allUsers = [];
     _endUser = null;
-    fetchUserWithPagination(_endUser);
+    fetchUserWithPagination();
   }
 
-  void fetchUserWithPagination(UserModel? endUser) async {
+  Future<void> fetchUserWithPagination() async {
     viewState = AllUserViewState.BUSY;
-    _allUsers = await _userRepository.fetchUsersWithPagination(endUser, _numberOfPages);
+    List<UserModel> users = await _userRepository.fetchUsersWithPagination(_endUser, _numberOfPages);
+    _allUsers ??= [];
+    _hasMore = users.length < _numberOfPages ? false : true;
+    _allUsers!.addAll(users);
+    _endUser = allUsersList?.last;
     viewState = AllUserViewState.LOADED;
+  }
+
+  Future<void> moreUser() async {
+    if (_hasMore) {
+      await fetchUserWithPagination();
+    }
+  }
+
+  Future<void> refresh() async {
+    _hasMore = true;
+    _endUser = null;
+    fetchUserWithPagination();
   }
 }
